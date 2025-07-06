@@ -10,6 +10,8 @@
             setDoc
         } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
+        import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+
         document.getElementById("signupForm").addEventListener("submit", async (e) => {
             
             e.preventDefault();
@@ -30,8 +32,10 @@
                 email,
 
             });
-
+            await sendEmailVerification(user);
             alert("V-ați înregistrat cu succes!");
+            //redirecționare
+            window.location.href="dashboard.html";
         }catch(error){
             console.error("Signup error:", error);
             alert("Eroare la înregistrare: " + error.message);
