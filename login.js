@@ -1,6 +1,13 @@
 import {auth} from './firebase.js'
-import {signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+import {signInWithEmailAndPassword, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 
+
+onAuthStateChanged(auth, user => {
+    if(user){
+        // redirecționare dacă utilizatorul e deja conectat
+        window.location.href="dashboard.html";
+    }
+});
 const loginForm= document.getElementById("loginForm");
 
 loginForm.addEventListener("submit", async (e) => {
@@ -13,6 +20,8 @@ loginForm.addEventListener("submit", async (e) => {
         const user= userCredential.user;
 
         alert("Bine ai revenit!" )
+        //redirecționare
+        window.location.href="dashboard.html";
 
     }catch(error){
         console.error("Conectare nereușită", error);
