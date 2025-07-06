@@ -10,7 +10,7 @@
             setDoc
         } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
-        import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+        //import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 
         document.getElementById("signupForm").addEventListener("submit", async (e) => {
             
@@ -32,7 +32,7 @@
                 email,
 
             });
-            await sendEmailVerification(user);
+            //await sendEmailVerification(user);
             alert("V-ați înregistrat cu succes!");
             //redirecționare
             window.location.href="dashboard.html";
