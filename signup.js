@@ -33,7 +33,8 @@
 
             alert("V-ați înregistrat cu succes!");
         }catch(error){
-            alert("Eroare: ${error.message}");
+            console.error("Signup error:", error);
+            alert("Eroare la înregistrare: " + error.message);
         }
         });
     
