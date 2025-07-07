@@ -100,16 +100,26 @@ function displayFormattedPlan(plan) {
   output.innerHTML = "";
   plan.forEach(day => {
     const dayDiv = document.createElement("div");
+    dayDiv.className = "plan-day";
     dayDiv.innerHTML = `<h3>Ziua ${day.day}</h3>`;
+
     const ul = document.createElement("ul");
     day.tasks.forEach(task => {
       const li = document.createElement("li");
+      li.className = "task";
       li.innerHTML = `
-        <strong>${task.title}</strong>: ${task.description}
+        <strong>${task.title}</strong>
+        <p>${task.description}</p>
         <em>(${task.duration} min)</em>
       `;
       ul.appendChild(li);
     });
+
+    dayDiv.appendChild(ul);
+    output.appendChild(dayDiv);
+  });
+}
+
     dayDiv.appendChild(ul);
     output.appendChild(dayDiv);
   });
