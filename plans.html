@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="studyPlanForm">
+        <input type="text" name="grade" placeholder="Clasa" required />
+        <input type="text" name="subject" placeholder="Materie" required />
+        <input type="text" name="title" placeholder="Lecție sau subiect" required />
+        <input type="number" name="days" placeholder="Zile disponibile(opțional)" />
+        <input type="number" name="hours" placeholder="Ore disponibile/zi(opțional)" />
+        <button type="submit">Generează plan</button>
+
+    </form>
+    <div id="loading" style="display: none;">Planul tău se generează...</div>
+    <div id="planOutput"></div>
+
+    <script type="module" src="./plans.js"></script>
+</body>
+</html>
