@@ -1,20 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Dashboard | Thinkr</title>
 </head>
 <body>
-    <h1 id ="greeting">Se încarcă...</h1>
-    <button id="logoutBtn"> Deconectare</button>
-    <button id="resetBtn">Resetare parolă</button>
 
-    <script type="module" src="./dashboard.js"></script>
-    <script>
-        document.getElementById('resetBtn').addEventListener('click', () =>{
-            window.location.href="reset.html";
-        });
-    </script>
+
+  <header>
+    <div id="greeting">Bine ai venit!</div>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <main>
+    <h2>Generează un plan de studiu</h2>
+    <form id="StudyPlanForm">
+      <label>
+        Clasa:
+        <input type="text" id="grade" placeholder="Clasa" required />
+      </label><br/>
+
+      <label>
+        Materia:
+        <input type="text" id="subject" placeholder="Materie" required />
+      </label><br/>
+
+      <label>
+        Lecție / Subiect:
+        <input type="text" id="title" placeholder="Ce vrei să înveți?" required />
+      </label><br/>
+
+      <label>
+        Zile disponibile (opțional):
+        <input type="number" id="days" placeholder="Ex: 5" />
+      </label><br/>
+
+      <label>
+        Ore/zi (opțional):
+        <input type="number" id="hours" placeholder="Ex: 2" />
+      </label><br/>
+
+      <button type="submit">Generează plan</button>
+    </form>
+
+    <div id="loading" style="display: none;">
+      Se generează planul...
+    </div>
+
+    <section id="planOutput"></section>
+  </main>
+
+  <script type="module" src="plans.js"></script>
+
 </body>
 </html>
