@@ -17,15 +17,16 @@ export async function handler(event) {
   try {
     const { grade, subject, title, days, hours } = JSON.parse(event.body);
 
-    let prompt = `Creează un plan detaliat de studiu pentru un student în clasa a ${grade}-a care vrea să învețe despre ${title} la materia ${subject}.`;
-    if (days && hours) {
-      prompt += ` Studentul are ${days} zile și ${hours} ore pe zi.`;
-    } else if (days) {
-      prompt += ` Studentul are ${days} zile disponibile.`;
-    } else if (hours) {
-      prompt += ` Studentul are ${hours} ore pe zi.`;
-    } else {
-      prompt += ` Creează un roadmap flexibil organizat în faze.`;
+     let prompt = `Creează un plan detaliat de studiu (planul va contine la fiecare task si resurse web, cărți, iar descrierea va fi foarte detaliată, explicând exact ce trebuie să facă, tpiul de exercițiu, sau tipul de tehnciă, metodă, foart clar explicată)pentru un student in clasa a ${grade} care vrea sa invețe despre ${title} la materia ${subject}.`;
+
+    if (days && hours){
+        prompt+= `studentul are la dispoziție ${days} la dispoziție și ${hours} ore pe zi . Împarte planul pe zile, pentru fiecare zi task-uri care au un titlu, o descriere, si durata estimată`
+    }else if(days){
+        prompt+= `studentul are la dispoziție ${days} la dispoziție Împarte planul pe zile, pentru fiecare zi taskificultatea estimată `
+    }else if(hours){
+        prompt+= `studentul are la dispoziție ${hours} ore pe zi .Împarte planul pe faze, pentru fiecare fază: task-uri care au un titlu, o descriere, si durata estimată`
+    }else{
+        prompt+=`creaaza un roadmap flexibil organizat în faze, nu pe timp, fiecare fază are un task cu un titlu, o descriere, și dificultatea estimată(ușor/mediu/greu)`
     }
     prompt += `
 Returnează doar JSON în acest format:
