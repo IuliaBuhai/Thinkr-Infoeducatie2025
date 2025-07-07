@@ -101,12 +101,14 @@ function displayFormattedPlan(plan) {
   plan.forEach(day => {
     const dayDiv = document.createElement("div");
     dayDiv.innerHTML = `<h3> ${day.day}</h3>`;
+    dayDiv.className="plan-day";
     const ul = document.createElement("ul");
     day.tasks.forEach(task => {
       const li = document.createElement("li");
+      li.className="task";
       li.innerHTML = `
         <strong>${task.title}</strong>: ${task.description}
-        <em>(${task.duration} min)</em>
+        <em><span class="duration">(${task.duration} min)</span></em>
       `;
       
       ul.appendChild(li);
