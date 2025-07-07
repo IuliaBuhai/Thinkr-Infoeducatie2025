@@ -1,48 +1,72 @@
-import {Configuration, OpenAIApi} from 'openai';
+import { Configuration, OpenAIApi } from 'openai';
 
 const configuration = new Configuration({
-    apikey: ProcessingInstruction.env.OPENAI_API_KEY,
-
+  apiKey: process.env.OPENAI_API_KEY, 
 });
 
 const openai = new OpenAIApi(configuration);
 
-export async function handler(event, context){
-    const{grade, subject, title, days, hours}= JSON.parse(event.body);
+export async function handler(event, context) {
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: "Method not allowed" }),
+    };
+  }
 
-    let prompt = `Creează un plan detaliat de studiu (planul va contine la fiecare task si resurse web, cărți, iar descrierea va fi foarte detaliată, explicând exact ce trebuie să facă, tpiul de exercițiu, sau tipul de tehnciă, metodă, foart clar explicată)pentru un student in clasa a ${grade} care vrea sa invețe despre ${title} la materia ${subject}.`;
+  const { grade, subject, title, days, hours } = JSON.parse(event.body);
 
-    if (days && hours){
-        prompt+= `studentul are la dispoziție ${days} la dispoziție și ${hours} ore pe zi . Împarte planul pe zile, pentru fiecare zi task-uri care au un titlu, o descriere, si durata estimată`
-    }else if(days){
-        prompt+= `studentul are la dispoziție ${days} la dispoziție Împarte planul pe zile, pentru fiecare zi taskificultatea estimată `
-    }else if(hours){
-        prompt+= `studentul are la dispoziție ${hours} ore pe zi .Împarte planul pe faze, pentru fiecare fază: task-uri care au un titlu, o descriere, si durata estimată`
-    }else{
-        prompt+=`creaaza un roadmap flexibil organizat în faze, nu pe timp, fiecare fază are un task cu un titlu, o descriere, și dificultatea estimată(ușor/mediu/greu)`
+  let prompt = `Creează un plan detaliat de studiu (planul va conține la fiecare task și resurse web, cărți, iar descrierea va fi foarte detaliată) pentru un student în clasa a ${grade}-a care vrea să învețe despre ${title} la materia ${subject}.`;
+
+  if (days && hours) {
+    prompt += ` Studentul are la dispoziție ${days} zile și ${hours} ore pe zi. Împarte planul pe zile, fiecare zi cu task-uri care au un titlu, o descriere, și durata estimată.`;
+  } else if (days) {
+    prompt += ` Studentul are la dispoziție ${days} zile. Împarte planul pe zile, fiecare zi cu task-uri și dificultatea estimată.`;
+  } else if (hours) {
+    prompt += ` Studentul are la dispoziție ${hours} ore pe zi. Împarte planul pe faze, fiecare fază conține task-uri care au un titlu, o descriere, și durata estimată.`;
+  } else {
+    prompt += ` Creează un roadmap flexibil organizat în faze. Fiecare fază are un task cu titlu, descriere și dificultate estimată (ușor/mediu/greu).`;
+  }
+
+  prompt += `
+Returnează răspunsul strict în acest format:
+{
+  "plan": [
+    {
+      "day": 1,
+      "tasks": [
+        {
+          "title": "Titlu task",
+          "description": "Ce să facă studentul",
+          "duration": 45
+        }
+      ]
     }
-
-   prompt += ` 
-            Returnează răspunsul în acest format:
-                    {
-                          "plan": [
-                                    {
-                                    "day": 1,
-                                    "tasks": [
-                                        {
-                                          "title": "Titlu task",
-                                          "description": "Ce să facă studentul",
-                                          "duration": 45
-                                        }
-                                  ]
-                                    }
-                                  ]
+  ]
 }
 `;
 
+  try {
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+    });
+
+    const rawContent = completion.data.choices[0].message.content;
+
+    const plan = JSON.parse(rawContent);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(plan),
+    };
+
+  } catch (err) {
+    console.error("Error from OpenAI or JSON:", err.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Eroare la generarea planului" }),
+    };
+  }
 }
-const plan = JSON.parse(completion.data.choices[0].message.content);
-return {
-  statusCode: 200,
-  body: JSON.stringify(plan),
-};
