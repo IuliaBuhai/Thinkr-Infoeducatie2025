@@ -1,53 +1,116 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { addDoc, collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
-const greetingElement = document.getElementById('greeting')
-const logoutBtn = document.getElementById("logoutBtn");
+let currentUser = null;  
 
-//verificare sesiune
-onAuthStateChanged(auth, async(user)=> {
-    if(!user){
-        window.location.href='login.html';
-        return;
+
+const greetingElement = document.getElementById('greeting');
+const logoutBtn        = document.getElementById('logoutBtn');
+const form             = document.getElementById("StudyPlansForm");
+const loading          = document.getElementById("loading");
+const output           = document.getElementById("planOutput");
+
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    return window.location.href = 'login.html';
+  }
+
+  currentUser = user;
+
+
+  try {
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if (userSnap.exists()) {
+      const { name = "Utilizator", username = "" } = userSnap.data();
+      greetingElement.textContent = `Bine ai venit, ${name} (${username})!`;
+    } else {
+      greetingElement.textContent = "Bine ai venit!";
     }
+  } catch (err) {
+    console.error("Eroare la încărcare date utilizator:", err);
+    greetingElement.textContent = "Bine ai venit!";
+  }
 
 
-
-
-//informații user 
-
-try{
-    const userDocRef = doc(db, "users", user.uid);
-    const userDocSnap = await getDoc(userDocRef);
-
-    if(userDocSnap.exists()){
-
-        const userData= userDocSnap.data();
-        const name= userData.name || "Utilizator";
-        const username = userData.username || "";
-
-        greetingElement.textContent = `Bine ai venit, ${name} (${username})!`;
-
-    }else{
-        greetingElement.textContent="Bine ai venit!";
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    } catch (err) {
+      console.error("Eroare la deconectare:", err);
+      alert("Eroare la deconectare: " + err.message);
     }
-}catch(error){
-    console.log("Eroare date utilizator:", error);
-    greetingElement.textContent="Bine ai venit!";
+  });
 
+  initPlansForm();
+});
+
+
+function initPlansForm() {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const grade   = document.getElementById("grade").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const title   = document.getElementById("title").value.trim();
+    const days    = document.getElementById("days").value.trim();
+    const hours   = document.getElementById("hours").value.trim();
+
+    const formData = {
+      grade,
+      subject,
+      title,
+      days:  days  ? Number(days)  : null,
+      hours: hours ? Number(hours) : null
+    };
+
+    loading.style.display  = "block";
+    output.innerHTML        = "";
+
+    try {
+      
+      const res = await fetch("/.netlify/functions/generatePlan", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(formData)
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Eroare la generare plan");
+
+      await addDoc(collection(db, "studyPlans"), {
+        ...formData,
+        userId:    currentUser.uid,
+        createdAt: new Date(),
+        plan:      result.plan
+      });
+
+      displayFormattedPlan(result.plan);
+    } catch (err) {
+      output.innerHTML = `<p style="color:red;">${err.message}</p>`;
+    } finally {
+      loading.style.display = "none";
+    }
+  });
 }
 
-});
-//deconectare user 
-logoutBtn.addEventListener("click", async () => {
-    try{
-
-        await signOut(auth);
-        alert("Te-ai deconectat cu succes!")
-        window.location.href = "login.html";
-    }catch(error){
-        console.error("Eroare deconectare:", error)
-        alert("Eroare la deconectare:"+ error.message);
-    }
-});
+function displayFormattedPlan(plan) {
+  output.innerHTML = "";
+  plan.forEach(day => {
+    const dayDiv = document.createElement("div");
+    dayDiv.innerHTML = `<h3>Ziua ${day.day}</h3>`;
+    const ul = document.createElement("ul");
+    day.tasks.forEach(task => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${task.title}</strong>: ${task.description}
+        <em>(${task.duration} min)</em>
+      `;
+      ul.appendChild(li);
+    });
+    dayDiv.appendChild(ul);
+    output.appendChild(dayDiv);
+  });
+}
