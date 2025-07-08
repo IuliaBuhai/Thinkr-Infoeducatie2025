@@ -8,7 +8,24 @@ let today= new Date();
 today.setHours(0,0,0,0);
 
 
+let progressCircle = new ProgressBar.Circle("#goalProgressBar", {
+  color:'#4CAF50',
+  strokeWidth: 10, 
+  trailWidth: 5,
+  easing: 'easeInOut',
+  duration: 1400, 
+  text: {
+    autoStyleContainer:false
+  }, 
+  from: { color: '#FF5252' },
+  to: { color: '#4CAF50' },
+  step:function(state, circle){
+    circle.path.setAttribute("stroke", state.color);
+    let value = Math.round(circle.value()*100);
+    circle.setText(`${value}%`);
+  }
 
+})
 const greetingElement = document.getElementById('greeting');
 const logoutBtn        = document.getElementById('logoutBtn');
 const form             = document.getElementById("StudyPlanForm");
@@ -50,8 +67,8 @@ onAuthStateChanged(auth, async (user) => {
   displayPlansHistory();
   initPlansForm();
   initTimerLogic();
-  displaySessionsHistory();
-  updateProgressChart()
+  await displaySessionsHistory();
+  await updateProgressChart()
 });
 
 
@@ -389,26 +406,8 @@ await function formatTime(time){
   return result;
 }
 
-let todaySeconds = await getTodayStudyTime();
 
-let progressCircle = new ProgressBar.Circle("#goalProgressBar", {
-  color:'#4CAF50',
-  strokeWidth: 10, 
-  trailWidth: 5,
-  easing: 'easeInOut',
-  duration: 1400, 
-  text: {
-    autoStyleContainer:false
-  }, 
-  from: { color: '#FF5252' },
-  to: { color: '#4CAF50' },
-  step:function(state, circle){
-    circle.path.setAttribute("stroke", state.color);
-    let value = Math.round(circle.value()*100);
-    circle.setText(`${value}%`);
-  }
 
-})
 
 
 async function updateProgressChart(){
