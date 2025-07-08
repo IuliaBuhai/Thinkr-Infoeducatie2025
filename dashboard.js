@@ -46,6 +46,7 @@ onAuthStateChanged(auth, async (user) => {
   displayPlansHistory();
   initPlansForm();
   initTimerLogic();
+  displaySessionsHistory()
 });
 
 
@@ -133,8 +134,9 @@ async function displayPlansHistory(){
     where("userId", "==", currentUser.uid),
     orderBy("createdAt", "desc")
   );
+
   const snapshot = await getDocs(plans);
-  console.log("Planuri gasite:", snapshot.size);
+ 
   
   const displayHistory = document.getElementById("displayHistory");
   displayHistory.innerHTML = '';
@@ -165,6 +167,45 @@ async function displayPlansHistory(){
   displayHistory.appendChild(dl);
 }
 
+async function displaySessionsHistory(){
+  const sessions= query(
+    collection(db,"studySessions"),
+    where("userId", "==", currentUser.uid),
+    orderBy("createdAt", "desc")
+    );
+
+    const snapshot = await getDocs(sessions);
+
+    const displaySessHistory= document.getElementById("displaySessions");
+    displaySessHistory.innerHTML="";
+    const dl = document.createElement("dl");
+    dl.className="sessHistory";
+
+    snapshot.forEach(doc =>{
+      const data= doc.data();
+      const dt = document.createElement("dt");
+      const dd =document.createElement("dd");
+      const seconds= data.seconds;
+      let result ="";
+      let hours, mins, sec; 
+        hours = Math.floor(seconds / 3600);
+        mins = Math.floor((seconds % 3600) / 60);
+        sec = seconds % 60;
+
+
+      result = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+      dt.innerHTML=`${data.title}-<span class= "duration">${result}</span>  `;
+
+      const description = data.description? data.description : "" ;
+      dd.textContent=`${description}`;
+
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    });
+
+    displaySessHistory.appendChild(dl);
+  
+}
 
 function initTimerLogic(){
  console.log("initTimerLogic  ");
@@ -176,21 +217,10 @@ function initTimerLogic(){
     const pauseBtn = document.getElementById('pauseBtn');
     const submitBtn= document.getElementById('stopBtn');
     const resetBtn= document.getElementById('resetBtn');
-    console.log("startBtn:", startBtn);
-    console.log("pauseBtn:", pauseBtn);
-    console.log("submitBtn:", submitBtn);
-    console.log("resetBtn:", resetBtn);
-    console.log("timeDisplay:", timeDisplay);
+    
     let seconds = 0;
     let running= false;
 
-    function startOrStop(){
-      if(running){
-        running = false;
-      }else{
-        running= true;
-      }
-    }
 
     let intervalId;
     startBtn.addEventListener("click", (e)=>{
@@ -217,8 +247,7 @@ function initTimerLogic(){
         running= false;
         clearInterval(intervalId);
     });
-    console.log("StartBtn:", startBtn);
-
+    
     submitBtn.addEventListener("click", async (e)=>{
         e.preventDefault();
          console.log("Start apasat");
@@ -229,7 +258,6 @@ function initTimerLogic(){
         const title= document.getElementById('sessionTitle').value.trim();
         const description= document.getElementById('sessionDescription').value.trim();
 
-        let setInterval = 0;
 
         await addDoc(collection(db, "studySessions"), {
             userId:    currentUser.uid,
@@ -240,7 +268,7 @@ function initTimerLogic(){
             
         })
 
-
+        displaySessionsHistory();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
 
@@ -252,10 +280,9 @@ function initTimerLogic(){
         seconds=0;
         timeDisplay.textContent='00:00:00';
         startBtn.disabled= false;
+        displaySessionsHistory();
     });
-    let hours;
-    let mins;
-    let sec;
+  
     function updateTimeDisplay(){
       let result ="";
         hours = Math.floor(seconds / 3600);
@@ -272,5 +299,4 @@ function initTimerLogic(){
 
 
 };
-
 
