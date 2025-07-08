@@ -285,9 +285,9 @@ function initTimerLogic(){
   
     function updateTimeDisplay(){
       let result ="";
-        hours = Math.floor(seconds / 3600);
-        mins = Math.floor((seconds % 3600) / 60);
-        sec = seconds % 60;
+        let hours = Math.floor(seconds / 3600);
+        let mins = Math.floor((seconds % 3600) / 60);
+        let sec = seconds % 60;
 
 
         result = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
