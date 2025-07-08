@@ -306,7 +306,8 @@ const goalForm = document.getElementById('studyGoal');
 
 
 goalForm.addEventListener("submit", initDailyGoal);
-async function initDailyGoal(){
+async function initDailyGoal(e){
+      e.preventDefault();
       let goal = document.getElementById('time').value.trim();
       let parts= goal.split(":");
       let hours= parseInt(parts[0]);
@@ -328,12 +329,16 @@ async function initDailyGoal(){
             goal : seconds,
             date : new Date()
           })
+           alert("Obiectiv salvat cu succes!");
         }else{
           const docRef = snapshot.docs[0].ref;
           await updateDoc(docRef, {
             
             goal : seconds,
             date : new Date()
+
+            
           })
+          alert("Obiectiv actualizat cu succes!");
         }
       };
