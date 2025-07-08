@@ -1,13 +1,13 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { addDoc, collection, doc,  query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { addDoc, collection, doc,  query, where, orderBy, getDocs ,getDoc} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
 let currentUser = null;  
 
 
 const greetingElement = document.getElementById('greeting');
 const logoutBtn        = document.getElementById('logoutBtn');
-const form             = document.getElementById("StudyPlansForm");
+const form             = document.getElementById("StudyPlanForm");
 const loading          = document.getElementById("loading");
 const output           = document.getElementById("planOutput");
 
@@ -117,6 +117,11 @@ function displayFormattedPlan(plan) {
     dayDiv.appendChild(ul);
     output.appendChild(dayDiv);
   });
+  if (!plan || plan.length === 0) {
+  output.innerHTML = "<p>Planul este gol sau nu a fost generat corect.</p>";
+  return;
+}
+
 }
 async function displayPlansHistory(){
     const plans= query(
