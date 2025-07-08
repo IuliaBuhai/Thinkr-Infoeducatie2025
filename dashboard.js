@@ -1,8 +1,6 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { addDoc, collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-import { query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-
+import { addDoc, collection, doc,  query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
 let currentUser = null;  
 
@@ -149,4 +147,4 @@ async function displayPlansHistory(){
 
 }
 
-S
+
