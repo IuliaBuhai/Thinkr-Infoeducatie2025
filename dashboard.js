@@ -1,6 +1,8 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
 
 let currentUser = null;  
 
@@ -43,7 +45,7 @@ onAuthStateChanged(auth, async (user) => {
       alert("Eroare la deconectare: " + err.message);
     }
   });
-
+  displayPlansHistory();
   initPlansForm();
 });
 
@@ -87,6 +89,7 @@ function initPlansForm() {
         plan:      result.plan
       });
 
+      displayPlansHistory();
       displayFormattedPlan(result.plan);
     } catch (err) {
       output.innerHTML = `<p style="color:red;">${err.message}</p>`;
@@ -117,3 +120,33 @@ function displayFormattedPlan(plan) {
     output.appendChild(dayDiv);
   });
 }
+async function displayPlansHistory(){
+    const plans= query(
+        collection(db, "studyPlans"),
+         where("userId", "==" , currentUser.uid), 
+         orderBy("createdAt", "desc")
+    );
+    const snapshot = await getDocs(plans);
+
+    const displayHistory= document.getElementById("displayHistory");
+    displayHistory.innerHTML='';
+    const dl= document.createElement("dl");
+    dl.className="history"
+    snapshot.forEach(doc =>{
+        const data= doc.data();
+        const dt= document.createElement("dt");
+        dt.innerHTML=`${data.title}-${data.subject}`;
+        const dd=document.createElement("dd");
+        dd.innerHTML=`creat la: ${data.createdAt.toDate().toLocaleDateString()}`;
+        
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+
+    }
+    );
+     displayHistory.appendChild(dl);
+    
+
+}
+
+S
