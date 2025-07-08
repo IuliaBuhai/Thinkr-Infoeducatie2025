@@ -213,10 +213,11 @@ function initTimerLogic(){
         running= false;
         clearInterval(intervalId);
     });
+    console.log("StartBtn:", startBtn);
 
     submitBtn.addEventListener("click", async (e)=>{
         e.preventDefault();
-
+         console.log("Start apasat");
         running= false;
         clearInterval(intervalId);
         startBtn.disabled=true;
