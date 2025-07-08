@@ -1,9 +1,10 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { addDoc, collection, doc,  query, where, orderBy, getDocs ,getDoc} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { addDoc, collection, doc,  query, where, orderBy, getDocs ,getDoc, updateDoc} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
 let currentUser = null;  
-
+let today= new Date();
+today.setHours(0,0,0,0);
 
 const greetingElement = document.getElementById('greeting');
 const logoutBtn        = document.getElementById('logoutBtn');
@@ -46,7 +47,8 @@ onAuthStateChanged(auth, async (user) => {
   displayPlansHistory();
   initPlansForm();
   initTimerLogic();
-  displaySessionsHistory()
+  displaySessionsHistory();
+
 });
 
 
@@ -300,3 +302,38 @@ function initTimerLogic(){
 
 };
 
+const goalForm = document.getElementById('studyGoal');
+
+
+goalForm.addEventListener("submit", initDailyGoal);
+async function initDailyGoal(){
+      let goal = document.getElementById('time').value.trim();
+      let parts= goal.split(":");
+      let hours= parseInt(parts[0]);
+      let minutes = parseInt(parts[1]);
+      let seconds = 60*minutes+ 3600*hours;
+      
+      const prevGoal= query(
+            collection(db, "studyGoal"),
+            where("userId", "==", currentUser.uid),
+            where("date", ">=" , today)
+      );
+      
+      const snapshot = await getDocs(prevGoal);
+
+        if(snapshot.empty){
+
+          await addDoc(collection(db, "studyGoal"), {
+            userId: currentUser.uid,
+            goal : seconds,
+            date : new Date()
+          })
+        }else{
+          const docRef = snapshot.docs[0].ref;
+          await updateDoc(docRef, {
+            
+            goal : seconds,
+            date : new Date()
+          })
+        }
+      };
