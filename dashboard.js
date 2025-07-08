@@ -229,8 +229,8 @@ async function displaySessionsHistory(){
   
 }
 
-function initTimerLogic(){
- console.log("initTimerLogic  ");
+function initrLogic(){
+ console.log("initrLogic  ");
 
   //logica ceas
     const clock = document.getElementById('clock');
@@ -330,7 +330,7 @@ const goalForm = document.getElementById('studyGoal');
 goalForm.addEventListener("submit", initDailyGoal);
 async function initDailyGoal(e){
       e.preventDefault();
-      let goal = document.getElementById('time').value.trim();
+      let goal = document.getElementById('timeGoal').value.trim();
       let parts= goal.split(":");
       let hours= parseInt(parts[0]);
       let minutes = parseInt(parts[1]);
