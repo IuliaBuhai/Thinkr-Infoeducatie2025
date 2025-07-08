@@ -45,6 +45,7 @@ onAuthStateChanged(auth, async (user) => {
   });
   displayPlansHistory();
   initPlansForm();
+  initTimerLogic();
 });
 
 
@@ -164,5 +165,107 @@ async function displayPlansHistory(){
   displayHistory.appendChild(dl);
 }
 
+
+function initTimerLogic(){
+ 
+
+  //logica ceas
+    const clock = document.getElementById('clock');
+    const timeDisplay= document.getElementById('time');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const submitBtn= document.getElementById('stopBtn');
+    const resetBtn= document.getElementById('resetBtn');
+    
+    let seconds = 0;
+    let running= false;
+
+    function startOrStop(){
+      if(running){
+        running = false;
+      }else{
+        running= true;
+      }
+    }
+
+    let intervalId;
+    startBtn.addEventListener("click", (e)=>{
+      e.preventDefault();
+
+        
+
+       if(!running){
+          running= true;
+
+           intervalId= setInterval(() =>{
+            seconds++;
+            updateTimeDisplay();
+          }, 1000);
+
+
+       }
+
+    });
+
+    pauseBtn.addEventListener("click", (e)=>{
+        e.preventDefault();
+
+        running= false;
+        clearInterval(intervalId);
+    });
+
+    submitBtn.addEventListener("click", async (e)=>{
+        e.preventDefault();
+
+        running= false;
+        clearInterval(intervalId);
+        startBtn.disabled=true;
+
+        const title= document.getElementById('sessionTitle').value.trim();
+        const description= document.getElementById('sessionDescription').value.trim();
+
+        let setInterval = 0;
+
+        await addDoc(doc(db, "studySessions", user.uid), {
+            userId:    currentUser.uid,
+            createdAt: new Date(),
+            seconds, 
+            title,
+            description, 
+            
+        })
+
+
+        alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
+    });
+
+    resetBtn.addEventListener("click", (e)=>{
+        e.preventDefault();
+
+        running= false;
+        clearInterval(intervalId);
+        seconds=0;
+        timeDisplay.textContent='00:00:00';
+        startBtn.disabled= false;
+    });
+    let hours;
+    let mins;
+    let sec;
+    function updateTimeDisplay(){
+      let result ="";
+        hours = Math.floor(seconds / 3600);
+        mins = Math.floor((seconds % 3600) / 60);
+        sec = seconds % 60;
+
+
+        result = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        timeDisplay.textContent= result;
+        
+
+    }
+    
+
+
+};
 
 
