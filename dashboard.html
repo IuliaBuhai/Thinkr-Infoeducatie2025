@@ -42,11 +42,13 @@
 .plan-day li.task em {
   font-size: 0.85rem;
   color: #888;
-  background-color: rgb(115, 222, 115);
-  border-radius: 50%;
-  color:rgb(8, 37, 8);
 }
 
+.plan-day li.task .duration{
+    background-color: rgb(115, 222, 115);
+    border-radius: 50%;
+    color:rgb(8, 37, 8);
+}
 
   </style>
 </head>
@@ -58,7 +60,25 @@
     <button id="logoutBtn">Logout</button>
   </header>
 
+
+
   <main>
+    <h2>Adaugă o sesiune de studiu</h2>
+
+    <form id="clock">
+      <div id="time"> 00:00:00</div>
+      <input type="text" id="sessionTitle" placeholder="Titlu sesiune/Materie" required />
+      <input type="text" id="sessionsDescription" placeholder="Detalii sesiune(ce ai învățat, ce ai reușit să faci etc.) - opțional" />
+      <button id="startBtn">Start</button>
+      <button id="pauseBtn"> Pauză</button>
+      <button type="submit" id="stopBtn">Stop</button>
+      <button type="reset" id="resetBtn">Resetează</button>
+    </form>
+
+
+
+
+
     <h2>Generează un plan de studiu</h2>
     <form id="StudyPlanForm">
       <label>
@@ -92,15 +112,17 @@
     <div id="loading" style="display: none;">
       Se generează planul...
     </div>
-  
-    <section id="planOutput"></section>
 
-    <h1>Istoric planuri</h1>
-    <div id="displayHistory"></div>
+    <section id="planOutput"></section>
+    <form id ="searchForm">
+    <input type="text" id="searchPlan" placeholder="Caută plan">
+    <button type="submit">Caută</button>
+    </form>
   </main>
 
-  <script type="module" src="./plans.js"></script>
-  <script type="module" src="./dashboard.js"></script>
+  
+
+  <script type="module" src="plans.js"></script>
 
 </body>
 </html>
