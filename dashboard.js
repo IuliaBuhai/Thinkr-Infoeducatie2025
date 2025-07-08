@@ -167,7 +167,7 @@ async function displayPlansHistory(){
 
 
 function initTimerLogic(){
- 
+ console.log("initTimerLogic  ");
 
   //logica ceas
     const clock = document.getElementById('clock');
@@ -176,7 +176,11 @@ function initTimerLogic(){
     const pauseBtn = document.getElementById('pauseBtn');
     const submitBtn= document.getElementById('stopBtn');
     const resetBtn= document.getElementById('resetBtn');
-    
+    console.log("startBtn:", startBtn);
+    console.log("pauseBtn:", pauseBtn);
+    console.log("submitBtn:", submitBtn);
+    console.log("resetBtn:", resetBtn);
+    console.log("timeDisplay:", timeDisplay);
     let seconds = 0;
     let running= false;
 
@@ -227,7 +231,7 @@ function initTimerLogic(){
 
         let setInterval = 0;
 
-        await addDoc(doc(db, "studySessions"), {
+        await addDoc(collection(db, "studySessions"), {
             userId:    currentUser.uid,
             createdAt: new Date(),
             seconds, 
