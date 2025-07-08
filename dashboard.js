@@ -127,7 +127,7 @@ async function displayPlansHistory(){
          orderBy("createdAt", "desc")
     );
     const snapshot = await getDocs(plans);
-
+    console.log("Planuri gasite:", snapshot.size);
     const displayHistory= document.getElementById("displayHistory");
     displayHistory.innerHTML='';
     const dl= document.createElement("dl");
