@@ -126,6 +126,7 @@ function displayFormattedPlan(plan) {
 
 
 async function displayPlansHistory(){
+  console.log("Current user ID:", currentUser?.uid);
   const plans = query(
     collection(db, "studyPlans"),
     where("userId", "==", currentUser.uid),
