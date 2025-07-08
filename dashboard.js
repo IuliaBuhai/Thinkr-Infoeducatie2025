@@ -229,7 +229,7 @@ async function displaySessionsHistory(){
   
 }
 
-function initrLogic(){
+function initTimerLogic(){
  console.log("initrLogic  ");
 
   //logica ceas
