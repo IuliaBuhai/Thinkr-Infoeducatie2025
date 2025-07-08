@@ -226,7 +226,7 @@ function initTimerLogic(){
 
         let setInterval = 0;
 
-        await addDoc(doc(db, "studySessions", user.uid), {
+        await addDoc(doc(db, "studySessions"), {
             userId:    currentUser.uid,
             createdAt: new Date(),
             seconds, 
