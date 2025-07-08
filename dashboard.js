@@ -1,3 +1,4 @@
+
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc,  query, where, orderBy, getDocs ,getDoc, updateDoc} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
@@ -5,6 +6,8 @@ import { addDoc, collection, doc,  query, where, orderBy, getDocs ,getDoc, updat
 let currentUser = null;  
 let today= new Date();
 today.setHours(0,0,0,0);
+
+
 
 const greetingElement = document.getElementById('greeting');
 const logoutBtn        = document.getElementById('logoutBtn');
@@ -48,7 +51,7 @@ onAuthStateChanged(auth, async (user) => {
   initPlansForm();
   initTimerLogic();
   displaySessionsHistory();
-
+  updateProgressChart()
 });
 
 
@@ -271,6 +274,8 @@ function initTimerLogic(){
         })
 
         displaySessionsHistory();
+        getTodayStudyTime();
+        updateProgressChart();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
 
@@ -341,4 +346,90 @@ async function initDailyGoal(e){
           })
           alert("Obiectiv actualizat cu succes!");
         }
+
+        updateProgressChart();
       };
+
+
+async function getTodayStudyTime(){
+
+      let todayStudyTime=0;
+      let todayStart= new Date();
+      todayStart.setHours(0,0,0,0);
+
+      let tomorowStart= new Date(todayStart);
+      tomorowStart.setDate(tomorowStart.getDate()+1);
+      const sessionsToday = query(
+        
+        collection(db, "studySessions"), 
+        where("userId", "==", currentUser.uid), 
+        where("createdAt",">=", todayStart), 
+        where("createdAt", "<", tomorowStart)
+      );
+
+      const snapshot = await getDocs(sessionsToday);
+
+      snapshot.forEach(doc =>{
+        const data= doc.data();
+        todayStudyTime+= data.seconds || 0;
+
+      });
+
+      return todayStudyTime;
+
+
+}
+
+await function formatTime(time){
+  let hours =Math.floor(time/3600);
+  let minutes= Math.floor((time%3600)/60);
+  let seconds =Math.floor(time%60)
+
+  let result = `${hours.toString().padStart(2,0)}:${minutes.toString().padStart(2,0)}:${seconds.toString().padStart(2,0)}`;
+  return result;
+}
+
+let todaySeconds = await getTodayStudyTime();
+
+let progressCircle = new ProgressBar.Circle("#goalProgressBar", {
+  color:'#4CAF50',
+  strokeWidth: 10, 
+  trailWidth: 5,
+  easing: 'easeInOut',
+  duration: 1400, 
+  text: {
+    autoStyleContainer:false
+  }, 
+  from: { color: '#FF5252' },
+  to: { color: '#4CAF50' },
+  step:function(state, circle){
+    circle.path.setAttribute("stroke", state.color);
+    let value = Math.round(circle.value()*100);
+    circle.setText(`${value}%`);
+  }
+
+})
+
+
+async function updateProgressChart(){
+      const todayStudyTime= await getTodayStudyTime();
+      const goalToday = query(
+        collection(db, "studyGoal"),
+        where ("userId", "==", currentUser.uid), 
+      )
+  
+      const snapshot = await getDocs(goalToday);
+
+        if (snapshot.empty) {
+          console.warn("No study goal found for today.");
+          progressCircle.set(0);
+          progressCircle.setText("0%");
+          return;
+        }
+
+        const goalData = snapshot.docs[0].data();
+        const goal = goalData.goal || 1; 
+        const progress = todayStudyTime / goal;
+
+        progressCircle.animate(progress); 
+      }
