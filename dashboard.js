@@ -282,7 +282,7 @@ function initTimerLogic(){
         const title= document.getElementById('sessionTitle').value.trim();
         const description= document.getElementById('sessionDescription').value.trim();
         const tag = document.getElementById('sessionTag').value.trim();
-        const tagSugesstions = document.getElementById('tagSuggestions').value.trim();
+        
 
         await addDoc(collection(db, "studySessions"), {
             userId:    currentUser.uid,
