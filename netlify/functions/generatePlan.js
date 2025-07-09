@@ -27,12 +27,11 @@ Creează un plan de studiu pentru un elev din clasa a ${grade} care dorește să
 - Resurse recomandate reale, de încredere (cărți, articole, tutoriale video, platforme educaționale),
 - Nivelul de dificultate pentru fiecare task (ușor, mediu, avansat).
 
-Planul trebuie să cuprindă cel puțin:
+Planul trebuie să cuprindă:
 
-1. O zi dedicată fundamentelor teoretice și formalismului, cu studiu aprofundat, metode de notare și vizualizare a conceptelor.
-2. O zi pentru algoritmi, implementare practică, analiză de complexitate și rezolvare de probleme cu peer review.
-3. O zi pentru aplicații practice, studii de caz, mini-proiecte și prezentări.
-(Asta trebuie să conțină, nu 3 zile)
+1. fundamente teoretice și formalism, cu studiu aprofundat, metode de notare și vizualizare a conceptelor
+2. aplicații practice, studii de caz, mini-proiecte și prezentări.
+
 Fiecare zi va avea 2-3 taskuri clar diferențiate, care acoperă teoria, practica și reflecția critică.
 `;
 
