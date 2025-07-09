@@ -1,0 +1,68 @@
+{
+  "questions": [
+    {
+      "question": "Prefer să ascult explicații sau prelegeri pentru a înțelege mai bine materialul.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să învăț prin discuții sau dezbateri cu alții.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Rețin mai ușor informațiile atunci când le aud, nu când le citesc.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să folosesc înregistrări audio sau podcasturi pentru a învăța.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să repet cu voce tare ceea ce trebuie să învăț.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Ascult cu atenție tonul și inflexiunile atunci când cineva vorbește.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Prefer să primesc instrucțiuni orale în locul celor scrise.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Mă concentrez mai bine când învăț cu muzică de fundal sau sunete ambientale.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    }
+  ]
+}
