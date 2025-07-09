@@ -1,84 +1,48 @@
-import OpenAI from "openai";
+import {Configuration, OpenAIApi} from 'openai';
 
-export async function handler(event) {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" }),
-    };
-  }
+const configuration = new Configuration({
+    apikey: ProcessingInstruction.env.OPENAI_API_KEY,
 
-  try {
-    const { grade, title, subject, days, hours } = JSON.parse(event.body);
+});
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+const openai = new OpenAIApi(configuration);
 
-       let prompt = `Ești expert în educație, specializat în planuri de studiu eficiente pentru elevi de liceu.
+export async function handler(event, context){
+    const{grade, subject, title, days, hours}= JSON.parse(event.body);
 
-          Date de intrare:  
-          - Clasa: ${grade}  
-          - Disciplina: ${subject}  
-          - Subiect: "${title}"  
-          - Zile disponibile: ${days || "N/A"}  
-          - Ore pe zi: ${hours || "N/A"}  
-          
-          Creează un plan de studiu structurat pe zile. Pentru fiecare zi:  
-          - Generează 2-4 taskuri  
-          - Pentru fiecare task oferă: titlu, descriere clară, obiective, durata estimată în minute  
-          - Combină teorie, exerciții practice și recapitulare  
-          - Folosește metode de învățare activă (ex: exerciții, rezumate, întrebări)  
-          - Folosește limbaj clar, adecvat clasei  
-          
-          Returnează **doar JSON valid**, fără explicații, în format:
-          
-          [
-            {
-              "zi": 1,
-              "taskuri": [
-                {
-                  "titlu": "Titlul taskului",
-                  "descriere": "Descriere clară a ce trebuie făcut",
-                  "durata": 45
-                }
-              ]
-            }
-          ]
+    let prompt = `Creează un plan detaliat de studiu (planul va contine la fiecare task si resurse web, cărți, iar descrierea va fi foarte detaliată, explicând exact ce trebuie să facă, tpiul de exercițiu, sau tipul de tehnciă, metodă, foart clar explicată)pentru un student in clasa a ${grade} care vrea sa invețe despre ${title} la materia ${subject}.`;
 
-`;
-
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 1000,
-    });
-
-    const raw = completion.choices[0].message.content;
-
-    let plan;
-
-    try {
-      plan = JSON.parse(raw);
-    } catch (jsonErr) {
-      console.error("Invalid JSON from OpenAI:", raw);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Răspuns invalid de la OpenAI. Încearcă din nou." }),
-      };
+    if (days && hours){
+        prompt+= `studentul are la dispoziție ${days} la dispoziție și ${hours} ore pe zi . Împarte planul pe zile, pentru fiecare zi task-uri care au un titlu, o descriere, si durata estimată`
+    }else if(days){
+        prompt+= `studentul are la dispoziție ${days} la dispoziție Împarte planul pe zile, pentru fiecare zi taskificultatea estimată `
+    }else if(hours){
+        prompt+= `studentul are la dispoziție ${hours} ore pe zi .Împarte planul pe faze, pentru fiecare fază: task-uri care au un titlu, o descriere, si durata estimată`
+    }else{
+        prompt+=`creaaza un roadmap flexibil organizat în faze, nu pe timp, fiecare fază are un task cu un titlu, o descriere, și dificultatea estimată(ușor/mediu/greu)`
     }
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(plan),
-    };
-
-  } catch (err) {
-    console.error("Error in generatePlan:", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message || "Server error" }),
-    };
-  }
+   prompt += ` 
+            Returnează răspunsul în acest format:
+                    {
+                          "plan": [
+                                    {
+                                    "day": 1,
+                                    "tasks": [
+                                        {
+                                          "title": "Titlu task",
+                                          "description": "Ce să facă studentul",
+                                          "duration": 45
+                                        }
+                                  ]
+                                    }
+                                  ]
 }
+`;
+
+}
+const plan = JSON.parse(completion.data.choices[0].message.content);
+return {
+  statusCode: 200,
+  body: JSON.stringify(plan),
+};
