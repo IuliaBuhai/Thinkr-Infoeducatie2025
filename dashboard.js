@@ -1,4 +1,5 @@
 
+
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc,  query, where, orderBy, getDocs ,getDoc, updateDoc} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
@@ -239,7 +240,8 @@ function initTimerLogic(){
     const pauseBtn = document.getElementById('pauseBtn');
     const submitBtn= document.getElementById('stopBtn');
     const resetBtn= document.getElementById('resetBtn');
-    
+    const tag = document.getElementById('sessionTag').value.trim();
+    const tagSugesstions = document.getElementById('tagSugesstions').value.trim();
     let seconds = 0;
     let running= false;
 
@@ -432,3 +434,31 @@ async function updateProgressChart(){
 
         progressCircle.animate(progress); 
       }
+
+
+async function loadTagSuggestions(){
+  const sessionsQuery = query(
+    collection(db, "studySessions"),
+    where("UserId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(sessionsQuery);
+
+  const tagSet = new Set();
+  snapshot.forEach(doc => {
+    const tag = doc.data().tag?.trim();
+    if(tag) tagSet.add(tag);
+
+  });
+
+  const tagSugesstions = document.getElementById("tagSugesstions");
+  tagSugesstions.innerHTML="";
+
+  tagSet.forEach(tag =>{
+    const option = document.createElement("option");
+    option.value= tag;
+    tagSugesstions.appendChild(option);
+  });
+
+
+}
