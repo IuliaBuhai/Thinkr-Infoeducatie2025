@@ -52,6 +52,8 @@ export async function handler(event) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
+      max_tokens: 1000,
+      stream: true,
     });
 
     const raw = completion.choices[0].message.content;
