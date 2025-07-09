@@ -15,33 +15,39 @@ export async function handler(event) {
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    let prompt = `Ești un expert în educație și pedagogie, specializat în crearea planurilor de învățare eficiente pentru elevi de gimnaziu și liceu.
+    let prompt = `Ești un expert în educație, pedagogie și domeniul academic, specializat în crearea unor planuri de studiu foarte avansate, detaliate și profesionale pentru elevi de liceu sau studenți.
 
-Creează un plan de studiu **extrem de detaliat și profesionist** pentru un elev din clasa a ${grade} care vrea să învețe despre **"${title}"** la disciplina **"${subject}"**.
+Creează un plan de studiu pentru un elev din clasa a ${grade} care dorește să învețe temeinic despre subiectul "${title}" la disciplina "${subject}". Planul trebuie să fie structurat pe zile (sau faze, dacă nu sunt zile definite), să includă taskuri cu:
 
-Fiecare task din plan trebuie să includă:
-- Un **titlu clar**.
-- O **descriere didactică detaliată**, care să explice:
-  - Ce trebuie făcut pas cu pas.
-  - Tipul de exercițiu sau activitate.
-  - Tehnici/metode didactice utilizate (ex: metoda Cornell, Feynman, Pomodoro etc).
-  - Ce competențe sunt dezvoltate.
-- O **durată estimativă (în minute)**.
-- **Resurse recomandate** (cărți, articole web, videoclipuri, platforme educaționale), cu linkuri reale sau titluri de încredere.
+- Titlu clar și profesional,
+- Obiective didactice și competențe dezvoltate în fiecare task,
+- Descriere detaliată pas cu pas a ceea ce trebuie făcut,
+- Metode și tehnici pedagogice explicate (ex: metoda Cornell, metoda Feynman, Pomodoro, etc.),
+- Durata estimată în minute pentru fiecare task,
+- Resurse recomandate reale, de încredere (cărți, articole, tutoriale video, platforme educaționale),
+- Nivelul de dificultate pentru fiecare task (ușor, mediu, avansat).
+
+Planul trebuie să cuprindă:
+
+1. O zi dedicată fundamentelor teoretice și formalismului, cu studiu aprofundat, metode de notare și vizualizare a conceptelor.
+2. O zi pentru algoritmi, implementare practică, analiză de complexitate și rezolvare de probleme cu peer review.
+3. O zi pentru aplicații practice, studii de caz, mini-proiecte și prezentări.
+
+Fiecare zi va avea 2-3 taskuri clar diferențiate, care acoperă teoria, practica și reflecția critică.
 `;
 
-    if (days && hours) {
-      prompt += `Elevul are la dispoziție ${days} zile, cu ${hours} ore alocate zilnic. Împarte planul pe zile. Fiecare zi trebuie să conțină 2–4 taskuri, diversificate ca format și metodologie.`;
-    } else if (days) {
-      prompt += `Elevul are la dispoziție ${days} zile în total. Împarte planul pe zile. Fiecare zi va avea taskuri echilibrate ca dificultate, progresive (de la ușor la avansat).`;
-    } else if (hours) {
-      prompt += `Elevul are la dispoziție ${hours} ore pe zi. Creează un plan organizat pe etape/faze logice de învățare, fiecare cu taskuri bine definite.`;
-    } else {
-      prompt += `Nu există constrângeri de timp. Creează un **roadmap flexibil**, structurat pe **etape de învățare** (ex: introducere, consolidare, aplicare), fiecare cu taskuri specifice. Fiecare task va avea și un indicator de dificultate estimativă (ușor / mediu / avansat).`;
-    }
+if (days && hours) {
+  prompt += `Elevul are la dispoziție ${days} zile, cu ${hours} ore alocate zilnic. Împarte planul pe zile. Fiecare zi trebuie să conțină 2–4 taskuri, diversificate ca format și metodologie.`;
+} else if (days) {
+  prompt += `Elevul are la dispoziție ${days} zile în total. Împarte planul pe zile. Fiecare zi va avea taskuri echilibrate ca dificultate, progresive (de la ușor la avansat).`;
+} else if (hours) {
+  prompt += `Elevul are la dispoziție ${hours} ore pe zi. Creează un plan organizat pe etape/faze logice de învățare, fiecare cu taskuri bine definite.`;
+} else {
+  prompt += `Nu există constrângeri de timp. Creează un **roadmap flexibil**, structurat pe **etape de învățare** (ex: introducere, consolidare, aplicare), fiecare cu taskuri specifice. Fiecare task va avea și un indicator de dificultate estimativă (ușor / mediu / avansat).`;
+}
 
-    prompt += `
-Returnează **doar un JSON valid** în următorul format (fără explicații suplimentare, fără markdown):
+prompt += `
+Returnează **doar JSON valid** în următorul format (fără explicații suplimentare, fără markdown):
 
 {
   "plan": [
@@ -50,11 +56,12 @@ Returnează **doar un JSON valid** în următorul format (fără explicații sup
       "tasks": [
         {
           "title": "Titlul taskului",
-          "description": "Descriere completă a activității, ce trebuie făcut pas cu pas, metode folosite etc.",
-          "duration": 45,
+          "description": "Descriere detaliată pas cu pas, obiective, metode didactice, competențe dezvoltate.",
+          "duration": 60,
+          "difficulty": "avansat",
           "resources": [
-            "https://resursa1.com",
-            "Titlul unei cărți utile"
+            "https://linkrelevant.com",
+            "Titlul unei cărți de specialitate"
           ]
         }
       ]
@@ -62,6 +69,7 @@ Returnează **doar un JSON valid** în următorul format (fără explicații sup
   ]
 }
 `;
+
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
