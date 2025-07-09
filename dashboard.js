@@ -300,8 +300,8 @@ function initTimerLogic(){
         displaySessionsHistory();
         getTodayStudyTime();
         updateProgressChart();
-        loadTagSuggestions();
-        loadTitleSuggestions();
+        await loadTagSuggestions();
+        await loadTitleSuggestions();
         await drawTimeDistributionChart();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
