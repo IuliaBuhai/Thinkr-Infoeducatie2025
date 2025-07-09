@@ -545,7 +545,7 @@ async function loadTitleSuggestions(){
     if(title) titleSet.add(title);
   });
 
-  const titleSuggestions = document.getElementById("titleSuggestion");
+  const titleSuggestions = document.getElementById("titleSuggestions");
   titleSuggestions.innerHTML="";
 
   titleSet.forEach(tag=>{
