@@ -14,33 +14,55 @@ export async function handler(event) {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  try {
-    const { grade, subject, title, days, hours } = JSON.parse(event.body);
+let prompt = `Ești un expert în educație și pedagogie, specializat în crearea planurilor de învățare eficiente pentru elevi de gimnaziu și liceu.
 
-     let prompt = `Creează un plan detaliat de studiu (planul va contine la fiecare task si resurse web, cărți, iar descrierea va fi foarte detaliată, explicând exact ce trebuie să facă, tpiul de exercițiu, sau tipul de tehnciă, metodă, foart clar explicată)pentru un student in clasa a ${grade} care vrea sa invețe despre ${title} la materia ${subject}.`;
+        Creează un plan de studiu **extrem de detaliat și profesionist** pentru un elev din clasa a ${grade} care vrea să învețe despre **"${title}"** la disciplina **"${subject}"**.
+        
+        Fiecare task din plan trebuie să includă:
+        - Un **titlu clar**.
+        - O **descriere didactică detaliată**, care să explice:
+          - Ce trebuie făcut pas cu pas.
+          - Tipul de exercițiu sau activitate.
+          - Tehnici/metode didactice utilizate (ex: metoda Cornell, Feynman, Pomodoro etc).
+          - Ce competențe sunt dezvoltate.
+        - O **durată estimativă (în minute)**.
+        - **Resurse recomandate** (cărți, articole web, videoclipuri, platforme educaționale), cu linkuri reale sau titluri de încredere.
 
-    if (days && hours){
-        prompt+= `studentul are la dispoziție ${days} la dispoziție și ${hours} ore pe zi . Împarte planul pe zile, pentru fiecare zi task-uri care au un titlu, o descriere, si durata estimată`
-    }else if(days){
-        prompt+= `studentul are la dispoziție ${days} la dispoziție Împarte planul pe zile, pentru fiecare zi taskificultatea estimată `
-    }else if(hours){
-        prompt+= `studentul are la dispoziție ${hours} ore pe zi .Împarte planul pe faze, pentru fiecare fază: task-uri care au un titlu, o descriere, si durata estimată`
-    }else{
-        prompt+=`creaaza un roadmap flexibil organizat în faze, nu pe timp, fiecare fază are un task cu un titlu, o descriere, și dificultatea estimată(ușor/mediu/greu)`
-    }
-    prompt += `
-Returnează doar JSON în acest format:
+`;
+
+if (days && hours) {
+  prompt += `Elevul are la dispoziție ${days} zile, cu ${hours} ore alocate zilnic. Împarte planul pe zile. Fiecare zi trebuie să conțină 2–4 taskuri, diversificate ca format și metodologie.`;
+} else if (days) {
+  prompt += `Elevul are la dispoziție ${days} zile în total. Împarte planul pe zile. Fiecare zi va avea taskuri echilibrate ca dificultate, progresive (de la ușor la avansat).`;
+} else if (hours) {
+  prompt += `Elevul are la dispoziție ${hours} ore pe zi. Creează un plan organizat pe etape/faze logice de învățare, fiecare cu taskuri bine definite.`;
+} else {
+  prompt += `Nu există constrângeri de timp. Creează un **roadmap flexibil**, structurat pe **etape de învățare** (ex: introducere, consolidare, aplicare), fiecare cu taskuri specifice. Fiecare task va avea și un indicator de dificultate estimativă (ușor / mediu / avansat).`;
+}
+
+prompt += `
+Returnează **doar un JSON valid** în următorul format (fără explicații suplimentare, fără markdown):
+
 {
   "plan": [
     {
       "day": 1,
       "tasks": [
-        { "title": "Titlu", "description": "Descriere detaliată", "duration": 45 }
+        {
+          "title": "Titlul taskului",
+          "description": "Descriere completă a activității, ce trebuie făcut pas cu pas, metode folosite etc.",
+          "duration": 45,
+          "resources": [
+            "https://resursa1.com",
+            "Titlul unei cărți utile"
+          ]
+        }
       ]
     }
   ]
 }
 `;
+
 
   
     const completion = await openai.chat.completions.create({
