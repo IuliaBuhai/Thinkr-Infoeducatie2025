@@ -26,6 +26,8 @@ let progressCircle = new ProgressBar.Circle("#goalProgressBar", {
     circle.setText(`${value}%`);
   }
 
+
+
 })
 const greetingElement = document.getElementById('greeting');
 const logoutBtn        = document.getElementById('logoutBtn');
@@ -71,6 +73,7 @@ onAuthStateChanged(auth, async (user) => {
   await displaySessionsHistory();
   await updateProgressChart();
   await loadTagSuggestions();
+  await drawTimeDistributionChart();
 });
 
 
@@ -298,6 +301,7 @@ function initTimerLogic(){
         getTodayStudyTime();
         updateProgressChart();
         loadTagSuggestions();
+        await drawTimeDistributionChart();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
 
@@ -464,4 +468,60 @@ async function loadTagSuggestions(){
   });
 
 
+}
+
+
+async function drawTimeDistributionChart() {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+
+  const sessionsToday = query(
+    collection(db, "studySessions"),
+    where("userId", "==", currentUser.uid),
+    where("createdAt", ">=", todayStart),
+    where("createdAt", "<", tomorrowStart)
+  );
+
+  const snapshot = await getDocs(sessionsToday);
+
+  const taskDurations = {};
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const title = data.title || "Necunoscut";
+    const seconds = data.seconds || 0;
+    if (!taskDurations[title]) taskDurations[title] = 0;
+    taskDurations[title] += seconds;
+  });
+
+  const labels = Object.keys(taskDurations);
+  const data = Object.values(taskDurations).map(sec => (sec / 60).toFixed(1)); 
+
+  const ctx = document.getElementById('timeDistributionChart').getContext('2d');
+  if (window.timeChart) window.timeChart.destroy(); 
+  window.timeChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Minute petrecute pe task (azi)',
+        data: data,
+        backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#e91e63', '#9c27b0', '#00bcd4']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        title: {
+          display: true,
+          text: 'Distribuția timpului de studiu pe taskuri (azi)'
+        }
+      }
+    }
+  });
 }
