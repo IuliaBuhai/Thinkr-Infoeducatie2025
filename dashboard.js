@@ -451,8 +451,8 @@ async function loadTagSuggestions(){
 
   });
 
-  const tagSugesstions = document.getElementById("tagSugesstions");
-  tagSugesstions.innerHTML="";
+  const tagSuggestions = document.getElementById("tagSuggestions");
+  tagSuggestions.innerHTML="";
 
   tagSet.forEach(tag =>{
     const option = document.createElement("option");
