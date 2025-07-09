@@ -74,6 +74,7 @@ onAuthStateChanged(auth, async (user) => {
   await loadTagSuggestions();
   await loadTitleSuggestions();
   await drawTimeDistributionChart();
+  await drawWeeklyChart();
 });
 
 
@@ -303,6 +304,7 @@ function initTimerLogic(){
         await loadTagSuggestions();
         await loadTitleSuggestions();
         await drawTimeDistributionChart();
+        await drawWeeklyChart();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
 
@@ -472,7 +474,7 @@ async function drawTimeDistributionChart() {
   });
 
   const labels = Object.keys(taskDurations);
-  const data = Object.values(taskDurations).map(sec => (sec / 60).toFixed(1)); // minutes
+  const data = Object.values(taskDurations).map(sec => (sec / 60).toFixed(1)); // minute
 
   const ctx = document.getElementById('timeDistributionChart').getContext('2d');
   if (window.timeChart) window.timeChart.destroy(); 
@@ -552,5 +554,96 @@ async function loadTitleSuggestions(){
     const option = document.createElement("option");
     option.value= tag;
     titleSuggestions.appendChild(option);
+  });
+}
+
+
+async function weekStudyTime(){
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const weekStart = new Date(todayStart);
+  weekStart.setDate( todayStart.getDate() -7 );
+  
+  const sessionsQuery= query(
+    collection(db, "studySessions"),
+    where("userId", "==", currentUser.uid),
+    where("createdAt", "<=", todayStart),
+    where("createdAt", ">=", weekStart)
+  );
+
+  const snapshot = await getDocs(sessionsQuery);
+  const labels=[];
+  const totals={};
+
+  for(let i= 6; i>= 0; i--){
+    const date= new Date(todayStart);
+    date.setDate(date.getDate()-i);
+    const label = date.toLocaleDateString('ro-RO', {weekday: 'short', month: 'numeric', day:'numeric'});
+    labels.push(label);
+    totals[label]=0;
+
+
+  }
+  snapshot.forEach(doc =>{
+    const data = doc.data();
+    const date = data.createdAt.toDate();
+    const label = date.toLocaleDateString('ro-RO', {weekday: 'short', month: 'numeric', day:'numeric'});
+    
+    if(totals[label] !== undefined) {
+    totals[label] += data.seconds || 0;
+  }
+  });
+
+  return{labels, totals};
+
+
+}
+
+
+async function drawWeeklyChart(){
+  const { labels, totals } = await weekStudyTime();
+  const data = labels.map(label => totals[label]);
+
+  const ctx = document.getElementById("weeklyStudyChart").getContext('2d');
+
+  
+  if (window.weeklyChart) window.weeklyChart.destroy();
+
+  window.weeklyChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Timp Studiat (minute)",
+          data: data.map(seconds => (seconds / 60).toFixed(1)), 
+          backgroundColor: 'rgba(54, 162, 235, 0.6)', 
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return value + ' minute';
+              }
+            }
+          }
+        },
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Timp de studiu în ultimele 7 zile'
+          }
+        }
+      }
   });
 }
