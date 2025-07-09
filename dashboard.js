@@ -1,8 +1,7 @@
-
-
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc,  query, where, orderBy, getDocs ,getDoc, updateDoc} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-storage.js";
 
 let currentUser = null;  
 let today= new Date();
@@ -73,6 +72,7 @@ onAuthStateChanged(auth, async (user) => {
   await displaySessionsHistory();
   await updateProgressChart();
   await loadTagSuggestions();
+  await loadTitleSuggestions();
   await drawTimeDistributionChart();
 });
 
@@ -301,6 +301,7 @@ function initTimerLogic(){
         getTodayStudyTime();
         updateProgressChart();
         loadTagSuggestions();
+        loadTitleSuggestions()
         await drawTimeDistributionChart();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
@@ -443,32 +444,6 @@ async function updateProgressChart(){
       }
 
 
-async function loadTagSuggestions(){
-  const sessionsQuery = query(
-    collection(db, "studySessions"),
-    where("userId", "==", currentUser.uid)
-  );
-
-  const snapshot = await getDocs(sessionsQuery);
-
-  const tagSet = new Set();
-  snapshot.forEach(doc => {
-    const tag = doc.data().tag?.trim();
-    if(tag) tagSet.add(tag);
-
-  });
-
-  const tagSuggestions = document.getElementById("tagSuggestions");
-  tagSuggestions.innerHTML="";
-
-  tagSet.forEach(tag =>{
-    const option = document.createElement("option");
-    option.value= tag;
-    tagSuggestions.appendChild(option);
-  });
-
-
-}
 
 
 async function drawTimeDistributionChart() {
@@ -497,7 +472,7 @@ async function drawTimeDistributionChart() {
   });
 
   const labels = Object.keys(taskDurations);
-  const data = Object.values(taskDurations).map(sec => (sec / 60).toFixed(1)); 
+  const data = Object.values(taskDurations).map(sec => (sec / 60).toFixed(1)); // minutes
 
   const ctx = document.getElementById('timeDistributionChart').getContext('2d');
   if (window.timeChart) window.timeChart.destroy(); 
@@ -523,5 +498,59 @@ async function drawTimeDistributionChart() {
         }
       }
     }
+  });
+}
+
+
+
+async function loadTagSuggestions(){
+  const sessionsQuery = query(
+    collection(db, "studySessions"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(sessionsQuery);
+
+  const tagSet = new Set();
+  snapshot.forEach(doc => {
+    const tag = doc.data().tag?.trim();
+    if(tag) tagSet.add(tag);
+
+  });
+
+  const tagSuggestions = document.getElementById("tagSuggestions");
+  tagSuggestions.innerHTML="";
+
+  tagSet.forEach(tag =>{
+    const option = document.createElement("option");
+    option.value= tag;
+    tagSuggestions.appendChild(option);
+  });
+
+
+}
+
+
+async function loadTitleSuggestions(){
+  const sessionsQuery = query(
+    collection(db, "studySessions"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(sessionsQuery);
+  const titleSet = new Set();
+
+  snapshot.forEach(doc =>{
+    const title = doc.data().title?.trim();
+    if(title) titleSet.add(title);
+  });
+
+  const titleSuggestions = document.getElementById("titleSuggestion");
+  titleSuggestions.innerHTML="";
+
+  titleSet.forEach(tag=>{
+    const option = document.createElement("option");
+    option.value= tag;
+    titleSuggestions.appendChild(option);
   });
 }
