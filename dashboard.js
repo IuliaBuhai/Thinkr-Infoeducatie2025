@@ -297,6 +297,7 @@ function initTimerLogic(){
         displaySessionsHistory();
         getTodayStudyTime();
         updateProgressChart();
+        loadTagSuggestions();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
 
