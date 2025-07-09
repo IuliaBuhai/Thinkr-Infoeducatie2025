@@ -69,7 +69,8 @@ onAuthStateChanged(auth, async (user) => {
   initPlansForm();
   initTimerLogic();
   await displaySessionsHistory();
-  await updateProgressChart()
+  await updateProgressChart();
+  await loadTagSuggestions();
 });
 
 
@@ -240,8 +241,7 @@ function initTimerLogic(){
     const pauseBtn = document.getElementById('pauseBtn');
     const submitBtn= document.getElementById('stopBtn');
     const resetBtn= document.getElementById('resetBtn');
-    const tag = document.getElementById('sessionTag').value.trim();
-    const tagSugesstions = document.getElementById('tagSugesstions').value.trim();
+    
     let seconds = 0;
     let running= false;
 
@@ -281,7 +281,8 @@ function initTimerLogic(){
 
         const title= document.getElementById('sessionTitle').value.trim();
         const description= document.getElementById('sessionDescription').value.trim();
-
+        const tag = document.getElementById('sessionTag').value.trim();
+        const tagSugesstions = document.getElementById('tagSuggestions').value.trim();
 
         await addDoc(collection(db, "studySessions"), {
             userId:    currentUser.uid,
@@ -289,6 +290,7 @@ function initTimerLogic(){
             seconds, 
             title,
             description, 
+            tag
             
         })
 
@@ -351,7 +353,8 @@ async function initDailyGoal(e){
           await addDoc(collection(db, "studyGoal"), {
             userId: currentUser.uid,
             goal : seconds,
-            date : new Date()
+            date : new Date(),
+            
           })
            alert("Obiectiv salvat cu succes!");
         }else{
@@ -398,8 +401,7 @@ async function getTodayStudyTime(){
 
 
 }
-
-await function formatTime(time){
+function formatTime(time){
   let hours =Math.floor(time/3600);
   let minutes= Math.floor((time%3600)/60);
   let seconds =Math.floor(time%60)
@@ -439,7 +441,7 @@ async function updateProgressChart(){
 async function loadTagSuggestions(){
   const sessionsQuery = query(
     collection(db, "studySessions"),
-    where("UserId", "==", currentUser.uid)
+    where("userId", "==", currentUser.uid)
   );
 
   const snapshot = await getDocs(sessionsQuery);
@@ -457,7 +459,7 @@ async function loadTagSuggestions(){
   tagSet.forEach(tag =>{
     const option = document.createElement("option");
     option.value= tag;
-    tagSugesstions.appendChild(option);
+    tagSuggestions.appendChild(option);
   });
 
 
