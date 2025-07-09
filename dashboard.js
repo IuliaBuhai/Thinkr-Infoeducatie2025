@@ -301,7 +301,7 @@ function initTimerLogic(){
         getTodayStudyTime();
         updateProgressChart();
         loadTagSuggestions();
-        loadTitleSuggestions()
+        loadTitleSuggestions();
         await drawTimeDistributionChart();
         alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză")
     });
