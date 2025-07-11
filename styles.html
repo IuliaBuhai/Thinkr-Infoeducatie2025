@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Stil de Învățare</title>
+  <style>
+    .question-block {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Testul Stilurilor de Învățare</h1>
+  <form id="learningStyleForm">
+    <div id="questionsContainer"></div>
+    <button type="submit">Trimite</button>
+  </form>
+
+  <p id="resultDisplay"></p>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import {onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js';
+    import {addDoc,collection } from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js';
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return window.location.href = 'login.html';
+      currentUser = user;
+    });
+
+    const learningTests = {
+      Vizual: [{
+  "questions": [
+    {
+      "question": "Prefer să văd informațiile scrise pe tablă și să fie completate de materiale vizuale și lecturi atribuite.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să notez sau să iau notițe pentru revizuire vizuală.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Mă descurc și îmi place să creez grafice și diagrame.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Înțeleg ușor și urmez cu succes indicațiile de pe o hartă.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Înțeleg mai bine un articol de știri citind despre el într-un ziar decât ascultând un raport la radio.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Cred că cel mai bun mod de a-ți aminti ceva este să îți imaginezi acea informație în mintea ta.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Sunt priceput în rezolvarea puzzle-urilor și labirinturilor.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Prefer să obțin informații despre un subiect interesant citind despre el.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    }
+  ]
+}
+], 
+      Auditiv: [{
+  "questions": [
+    {
+      "question": "Prefer să ascult explicații sau prelegeri pentru a înțelege mai bine materialul.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să învăț prin discuții sau dezbateri cu alții.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Rețin mai ușor informațiile atunci când le aud, nu când le citesc.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să folosesc înregistrări audio sau podcasturi pentru a învăța.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să repet cu voce tare ceea ce trebuie să învăț.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Ascult cu atenție tonul și inflexiunile atunci când cineva vorbește.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Prefer să primesc instrucțiuni orale în locul celor scrise.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Mă concentrez mai bine când învăț cu muzică de fundal sau sunete ambientale.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    }
+  ]
+}
+
+], 
+      Tactil: [{
+  "questions": [
+    {
+      "question": "Prefer să folosesc postere, modele sau practică efectivă și alte activități în clasă",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să lucrez cu mâinile sau să fac lucruri",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi amintesc cel mai bine scriind lucrurile.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Mă joc cu monede sau chei în buzunar.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Mestec gumă, fumez sau iau gustări în timp ce studiez.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Învăț ortografia cuvintelor „scriindu-le cu degetele” în aer",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Țin obiecte în mâini în timpul perioadelor de învățare.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Nu am o problemă când vine vorba de contactul fizic cu alte persoane",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    }
+  ]
+}
+], 
+    };
+
+    const container = document.getElementById('questionsContainer');
+    const form = document.getElementById('learningStyleForm');
+
+    Object.entries(learningTests).forEach(([type, questions]) => {
+      const header = document.createElement('h2');
+      header.textContent = `Test ${type}`;
+      container.appendChild(header);
+
+      questions.forEach((q, qIndex) => {
+        const block = document.createElement('div');
+        block.className = 'question-block';
+
+        const title = document.createElement('p');
+        title.textContent = `${qIndex + 1}. ${q.question}`;
+        block.appendChild(title);
+
+        q.answers.forEach((a) => {
+          const label = document.createElement('label');
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = `${type}-q${qIndex}`;
+          input.value = a.score;
+          input.required = true;
+
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(" " + a.text));
+          block.appendChild(label);
+        });
+
+        container.appendChild(block);
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const results = { Vizual: 0, Auditiv: 0, Tactil: 0 };
+
+      Object.entries(learningTests).forEach(([type, questions]) => {
+        questions.forEach((_, qIndex) => {
+          const selected = document.querySelector(
+            `input[name='${type}-q${qIndex}']:checked`
+          );
+          if (selected) results[type] += parseInt(selected.value);
+        });
+      });
+
+      const max = Math.max(...Object.values(results));
+      const dominant = Object.keys(results).find((key) => results[key] === max);
+
+      document.getElementById('resultDisplay').textContent =
+        `Stilul tău dominant este: ${dominant} (Scoruri: Vizual=${results.Vizual}, Auditiv=${results.Auditiv}, Tactil=${results.Tactil})`;
+
+      try {
+        await addDoc(collection(db, 'testResults'), {
+          userId: currentUser.uid,
+          timestamp: new Date().toISOString(),
+          results
+        });
+        alert('Rezultatul a fost salvat în Firebase.');
+      } catch (error) {
+        console.error('Eroare salvare Firebase:', error);
+      }
+    });
+  </script>
+</body>
+</html>
