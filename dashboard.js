@@ -219,7 +219,7 @@ async function displaySessionsHistory() {
     sec = seconds % 60;
 
     result = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    dt.innerHTML = `${data.title}-<span class="duration">${result}</span>  `;
+    dt.innerHTML = `<b>${data.tag}</b> ->${data.title}(<span class="duration">${result}</span> ) `;
 
     const description = data.description ? data.description : "";
     dd.textContent = `${description}`;
