@@ -602,6 +602,7 @@ async function drawTimeDistributionChart() {
 }
 
 async function drawWeeklyChart() {
+  console.log('drawWeeklyChart creat:', new Date().toISOString());
   try {
     document.getElementById('weeklyLoader').style.display = 'flex';
     
