@@ -121,7 +121,7 @@ function initPlansForm() {
       });
 
       displayPlansHistory();
-      displayFormattedPlan(result.plan);
+      //displayFormattedPlan(result.plan);
     } catch (err) {
       output.innerHTML = `<p style="color:red;">${err.message}</p>`;
     } finally {
@@ -178,7 +178,7 @@ async function displayPlansHistory() {
   snapshot.forEach(doc => {
     const data = doc.data();
     const dt = document.createElement("dt");
-    dt.innerHTML = `${data.title}-${data.subject}`;
+    dt.innerHTML = `<b>${data.subject}</b>-${data.title}`;
 
     const dd = document.createElement("dd");
     const createdAtDate = data.createdAt instanceof Date
