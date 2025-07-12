@@ -579,11 +579,19 @@ button:disabled {
                         <p id="progressComparison"></p>
                     </div>
                 </div>
-                <form id="studyGoal" class="goal-form">
-                    <label for="timeGoal">Obiectiv zilnic (ore:minute):</label>
-                    <input type="time" id="timeGoal" required>
-                    <button type="submit">Salvează</button>
-                </form>
+                    <div class="card pulse">
+                          <h3>Obiectiv zilnic</h3>
+                          <div id="goalProgressContainer">
+                            <div id="goalProgressBar"></div>
+                            <div id="goalProgressLabel"></div>
+                          </div>
+                          <div id="progressText" style="text-align: center; margin: 1rem 0; font-weight: 500;"></div>
+                          <div id="progressComparison" style="text-align: center; font-size: 0.9rem; color: var(--text-secondary);"></div>
+                          <form id="studyGoal">
+                            <input type="time" id="timeGoal" required />
+                            <button type="submit">Setează target</button>
+                          </form>
+                    </div>
             </section>
 
          
@@ -645,11 +653,24 @@ button:disabled {
                 </div>
             </section>
 
-           =
+            <section class="card fade-in">
+              <h2>Activitate recentă</h2>
+              <p class="section-description">Vizualizează-ți activitatea de studiu din ultimele 12 săptămâni.</p>
+              <div id="studyHeatmap" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 1.5rem;">
+               
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                <span>Mai puțin</span>
+                <span>Mai mult</span>
+              </div>
+            </section>
+
+            
             <section class="card heatmap-card">
                 <h2>Istoric studiu (12 săptămâni)</h2>
                 <div id="studyHeatmap" class="heatmap-container"></div>
             </section>
+            
 
             <section class="card plan-card">
                 <h2>Generator Plan Studiu</h2>
@@ -698,7 +719,7 @@ button:disabled {
     </main>
 
     <footer>
-        <p>StudyTrack &copy; 2023</p>
+        <p>StudyTrack &copy; 2025</p>
     </footer>
 </body>
 </html>
