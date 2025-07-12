@@ -4,7 +4,7 @@ import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, update
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-storage.js";
 import ProgressBar from "https://cdn.jsdelivr.net/npm/progressbar.js";
 
-
+Chart.register(ChartDataLabels);
 
 
 let currentUser = null;
