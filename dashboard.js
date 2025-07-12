@@ -707,7 +707,7 @@ async function drawWeeklyChart() {
             }
           }
         },
-        animation: false;
+        animation: false,
       }
     });
 
