@@ -741,7 +741,7 @@
     <button class="fab" id="mobileFab">+</button>
 
     <script>
-        // Add spin animation for loading spinner
+        
         const style = document.createElement('style');
         style.textContent = `
             @keyframes spin {
@@ -751,13 +751,13 @@
         `;
         document.head.appendChild(style);
 
-        // Mobile fab button functionality
+        
         document.getElementById('mobileFab').addEventListener('click', function() {
-            // Scroll to the timer form
+            
             document.querySelector('#clock').scrollIntoView({ behavior: 'smooth' });
         });
     </script>
-    <script src="dashboard.js" type="module"></script>
-    <script src="plans.js" type="module"></script>
+    <script type="module" src="dashboard.js" ></script>
+    <script  type="module" src="plans.js"></script>
 </body>
 </html>
