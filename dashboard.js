@@ -61,6 +61,7 @@ onAuthStateChanged(auth, async (user) => {
     await loadTagSuggestions();
     await loadTitleSuggestions();
     await drawTimeDistributionChart();
+    console.log('drawWeeklyChart');
     await drawWeeklyChart();
     await renderHeatmap();
 
