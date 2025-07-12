@@ -27,6 +27,7 @@
 
             // Stocare informații în Firestore
             await setDoc(doc(db, "users", user.uid), {
+                userId :user.uid,
                 username,
                 name, 
                 email,
