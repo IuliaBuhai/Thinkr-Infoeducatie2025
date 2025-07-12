@@ -707,14 +707,7 @@ async function drawWeeklyChart() {
             }
           }
         },
-        animation: {
-          delay: (context) => {
-            if (context.type === 'data' && context.mode === 'default') {
-              return context.dataIndex * 100;
-            }
-            return 0;
-          }
-        }
+        animation: false;
       }
     });
 
