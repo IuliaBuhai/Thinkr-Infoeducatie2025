@@ -7,7 +7,8 @@
 
         import {
             doc,
-            setDoc
+            setDoc,
+            addDoc
         } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
         //import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
@@ -27,12 +28,22 @@
 
             // Stocare informații în Firestore
             await setDoc(doc(db, "users", user.uid), {
-                userId :user.uid,
+                
                 username,
                 name, 
                 email,
 
             });
+
+                await addDoc(collection(db, "users"), {
+                userId: user.uid,
+                username,
+                name, 
+                email,
+
+            });
+
+                    
             //await sendEmailVerification(user);
             alert("V-ați înregistrat cu succes!");
             //redirecționare
