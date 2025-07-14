@@ -812,6 +812,8 @@ async function displayXp(){
   const xp = await getXp();
   console.log(xp);
   xpElement.innerHTML= `<img src="xp.png" class="xpImg" /> ${xp}XP` ; 
+
+  await storeXp();
 }
 
 
