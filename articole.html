@@ -265,6 +265,59 @@
             -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
+        
+        #leaderboard {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--glass-effect);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+        
+        #leaderboard th, 
+        #leaderboard td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            color: var(--text-primary);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+        
+        #leaderboard th {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        #leaderboard tr:hover {
+            background: rgba(77, 142, 255, 0.1);
+            cursor: default;
+        }
+        
+        #leaderboard tr:last-child td {
+            border-bottom: none;
+        }
+        
+        #leaderboard td:first-child {
+            width: 3rem; 
+            font-weight: 700;
+        }
+        
+        #leaderboard td:nth-child(3) {
+            width: 6rem; 
+            text-align: right;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
 
         @media (max-width: 768px) {
             .articles-grid {
