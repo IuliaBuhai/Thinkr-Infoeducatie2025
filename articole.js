@@ -58,15 +58,18 @@ async function getTop15(){
   }
 }
 
-async function getUserName(userId){
+async function getUserName(userId) {
   const sessionQuery = query(
     collection(db, "users"),
-    where ("UserId", "==", userId),
+    where("userId", "==", userId),
     limit(1)
-  )
-  const snapshot= await getDocs(sessionQuery);
+  );
 
-  const userName = snapshot.doc.data().name;
+  const snapshot = await getDocs(sessionQuery);
 
-  return userName;
+  if (snapshot.empty) {
+    return "Neidentificat"; 
+  }
+
+  return snapshot.docs[0].data().name;
 }
