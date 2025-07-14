@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Thinkr</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
@@ -620,7 +622,28 @@
           opacity: 1 !important;
           visibility: visible !important;
         }
-    
+        #xp{
+            background: linear-gradient(135deg, var(--warning), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 1.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: "Michroma", sans-serif;
+            font-weight: 500;
+            font-size: 1.8rem;
+            transition: var(--transition);
+            margin: 0.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: fit-content;
+        }
+        .xpImg{
+            height:2.3rem;
+            width: 2.3rem
+        }
 
     </style>
 </head>
@@ -686,7 +709,9 @@
         </section>
 
         <section class="card fade-in">
-            <h2>Activitate recentă</h2>
+            <h2>Activitatea ta</h2>
+            <p>XP-ul tău adunat de-a lungul timpului </p>
+            <button id="xp"><img src="xp.png" class="xpImg" /> 20 XP</button>
             <p class="section-description">Vizualizează-ți activitatea de studiu din ultimele 12 săptămâni.</p>
             <div id="studyHeatmap" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 0px; margin-top: 1.5rem;">
                 
@@ -791,7 +816,7 @@
         
         document.getElementById('mobileFab').addEventListener('click', function() {
           
-            document.querySelector('#clock').scrollIntoView({ behavior: 'smooth' });
+        document.querySelector('#clock').scrollIntoView({ behavior: 'smooth' });
         });
     </script>
     <script type="module" src="dashboard.js"></script>
