@@ -529,6 +529,14 @@
             box-shadow: 0 10px 30px rgba(77, 142, 255, 0.5);
         }
 
+        .heatmap-day {
+          width: 14px;
+          height: 14px;
+          border-radius: 3px;
+          transition: background-color 0.3s;
+        }
+
+
         @media (max-width: 768px) {
             .container {
                 padding: 1.5rem;
@@ -680,7 +688,7 @@
             <h2>Activitate recentă</h2>
             <p class="section-description">Vizualizează-ți activitatea de studiu din ultimele 12 săptămâni.</p>
             <div id="studyHeatmap" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 1.5rem;">
-                <!-- Heatmap will be generated here -->
+                
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
                 <span>Mai puțin</span>
