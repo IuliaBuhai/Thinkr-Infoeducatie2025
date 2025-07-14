@@ -64,7 +64,7 @@ async function getUserName(userId){
     where ("UserId", "==", userId),
     limit(1)
   )
-  const snapshot= await getDocs(query);
+  const snapshot= await getDocs(sessionQuery);
 
   const userName = snapshot.doc.data().name;
 
