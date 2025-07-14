@@ -813,3 +813,28 @@ async function displayXp(){
   console.log(xp);
   xpElement.innerHTML= `<img src="xp.png" class="xpImg" /> ${xp}XP` ; 
 }
+
+
+async function storeXp(){
+  const getXpValue = await getXp();
+  const xp = isNaN(getXpValue)? 0 : getXpValue;
+
+  const prevXp= query(
+    collection(db, "xp"),
+    where("userId", "==", currentUser.uid)
+  )
+
+  const snapshot= await getDocs(prevXp);
+
+  if(snapshot.empty){
+    await addDoc(collection(db, "xp"),{
+      userId :currentUser.uid,
+      xp: xp
+  });
+}else{
+  const docRef = snapshot.docs[0].ref;
+  await updateDoc(docRef, {
+    xp:xp
+  })
+    }
+}
