@@ -61,9 +61,9 @@ onAuthStateChanged(auth, async (user) => {
     await loadTagSuggestions();
     await loadTitleSuggestions();
     await drawTimeDistributionChart();
-    console.log('drawWeeklyChart');
     await drawWeeklyChart();
     await renderHeatmap();
+    await displayXp();
 
     // Set up logout
     logoutBtn.addEventListener("click", async () => {
@@ -776,4 +776,38 @@ async function renderHeatmap() {
   } catch (error) {
     console.error("Error rendering heatmap:", error);
   }
+}
+
+async function getTotalStudyTime(){
+
+    const sessionsQuery= query(
+        collection(db, "studySessions"), 
+        where("userId", "==", currentUser.uid)
+    );
+
+    const snapshot= await getDocs(sessionsQuery);
+
+    let totalStudyTime = 0;
+
+    snapshot.forEach(doc => {
+        const data= doc.data();
+        const sessionDuration = data.durationInSeconds;
+        totalStudyTime+=sessionDuration;
+
+
+    });
+
+    return totalStudyTime;
+
+}
+
+async function getXp(){
+      const totalStudyTime = await getTotalStudyTime();
+      const xp = Math.floor(totalStudyTime /600); // 10 minute= 1xp
+      return xp;
+}
+
+async function displayXp(){
+  const xpElement= document.getElementById("xp");
+  xpElement.innerHTML= await getXp();
 }
