@@ -1,12 +1,12 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-onAuthStateChanged(user => {
-    if(!user){
-        return window.location.href="login.html";
-    }
-});
 
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    return window.location.href = 'login.html';
+  }
+};
 async function getTop15(){
   const sessionQuery= query(
     collection(db,"xp"),
