@@ -285,6 +285,7 @@ function initTimerLogic() {
     await loadTitleSuggestions();
     await drawTimeDistributionChart();
     await drawWeeklyChart();
+    await displayXp();
     alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză");
   });
 
