@@ -1,56 +1,41 @@
+import { auth, db } from './firebase.js';
 
-        import {auth, db} from './firebase.js';
+import {
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 
-        import {
-            createUserWithEmailAndPassword
-        }from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+import {
+  collection,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
-        import {
-            doc,
-            setDoc,
-            addDoc
-        } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-        //import { sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+  const username = document.getElementById("username").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-        document.getElementById("signupForm").addEventListener("submit", async (e) => {
-            
-            e.preventDefault();
-            const username= document.getElementById("username").value.trim();
-            const name = document.getElementById("name").value.trim();
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value;
-
-            // Creare user Firebase
-            try{
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user=userCredential.user;
-
-            // Stocare informații în Firestore
-            await setDoc(doc(db, "users", user.uid), {
-                
-                username,
-                name, 
-                email,
-
-            });
-
-                await addDoc(collection(db, "users"), {
-                userId: user.uid,
-                username,
-                name, 
-                email,
-
-            });
-
-                    
-            //await sendEmailVerification(user);
-            alert("V-ați înregistrat cu succes!");
-            //redirecționare
-            window.location.href="dashboard.html";
-        }catch(error){
-            console.error("Signup error:", error);
-            alert("Eroare la înregistrare: " + error.message);
-        }
-        });
+  try {
     
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+   
+    await addDoc(collection(db, "users"), {
+      userId: user.uid,
+      username,
+      name,
+      email,
+      createdAt: new Date()
+    });
+
+    alert("V-ați înregistrat cu succes!");
+    window.location.href = "dashboard.html";
+
+  } catch (error) {
+    console.error("Signup error:", error);
+    alert("Eroare la înregistrare: " + error.message);
+  }
+});
