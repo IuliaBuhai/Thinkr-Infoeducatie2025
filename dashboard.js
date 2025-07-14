@@ -791,7 +791,7 @@ async function getTotalStudyTime(){
 
     snapshot.forEach(doc => {
         const data= doc.data();
-        const sessionDuration = parseInt(data.durationInSeconds);
+        const sessionDuration = parseInt(data.seconds);
         totalStudyTime+=sessionDuration;
 
 
