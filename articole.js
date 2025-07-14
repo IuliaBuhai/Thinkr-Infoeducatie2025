@@ -1,50 +1,44 @@
 import { auth, db } from './firebase.js';
-import { onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+import { collection, query, where, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     return window.location.href = 'login.html';
   }
-
   await getTop15();
 });
 
-async function getTop15(){
-  const sessionQuery= query(
-    collection(db,"xp"),
+async function getTop15() {
+  const sessionQuery = query(
+    collection(db, "xp"),
     where("xp", ">", 0),
     orderBy("xp", "desc"),
     limit(15)
-  )
+  );
 
-  const snapshot= await getDocs(sessionQuery);
+  const snapshot = await getDocs(sessionQuery);
 
-  const top = Math.min(snapshot.size , 15);
-  const leaderboard= document.getElementById("leaderboard");
-  const td = document.createElement("td");
-  const tr = document.createElement("tr");
-  const th = document.createElement("th");
-  leaderboard.innerHTML="";
+  const leaderboard = document.getElementById("leaderboard");
+  leaderboard.innerHTML = "";
 
-  ["Nr.", "Nume", "XP"].forEach(text =>{
+  // Create header row properly
+  const headerRow = document.createElement("tr");
+  ["Nr.", "Nume", "XP"].forEach(text => {
+    const th = document.createElement("th");
     th.textContent = text;
-    tr.appendChild(th);
-
+    headerRow.appendChild(th);
   });
-
-  leaderboard.appendChild(th);
+  leaderboard.appendChild(headerRow);
 
   for (let i = 0; i < snapshot.docs.length; i++) {
     const docData = snapshot.docs[i].data();
     const tr = document.createElement("tr");
 
-    
     const rankTd = document.createElement("td");
     rankTd.textContent = i + 1;
     tr.appendChild(rankTd);
 
-  
     const nameTd = document.createElement("td");
     const userName = await getUserName(docData.userId);
     nameTd.textContent = userName;
@@ -68,7 +62,7 @@ async function getUserName(userId) {
   const snapshot = await getDocs(sessionQuery);
 
   if (snapshot.empty) {
-    return "Neidentificat"; 
+    return "Neidentificat";
   }
 
   return snapshot.docs[0].data().name;
