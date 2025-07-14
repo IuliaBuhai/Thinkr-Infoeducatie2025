@@ -809,5 +809,7 @@ async function getXp(){
 
 async function displayXp(){
   const xpElement= document.getElementById("xp");
-  xpElement.innerHTML= await getXp();
+  const xp = await getXp();
+  console.log(xp);
+  xpElement.innerHTML= xp ; 
 }
