@@ -60,7 +60,7 @@ async function getTop15(){
 
 async function getUserName(userId){
   const sessionQuery = query(
-    collection(db, "user"),
+    collection(db, "users"),
     where ("UserId", "==", userId),
     limit(1)
   )
