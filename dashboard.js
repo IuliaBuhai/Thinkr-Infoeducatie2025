@@ -63,7 +63,7 @@ onAuthStateChanged(auth, async (user) => {
     await drawTimeDistributionChart();
     await drawWeeklyChart();
     await renderHeatmap();
-    await displayXp();
+    displayXp();
 
     // Set up logout
     logoutBtn.addEventListener("click", async () => {
@@ -791,7 +791,7 @@ async function getTotalStudyTime(){
 
     snapshot.forEach(doc => {
         const data= doc.data();
-        const sessionDuration = data.durationInSeconds;
+        const sessionDuration = ParseInt(data.durationInSeconds);
         totalStudyTime+=sessionDuration;
 
 
@@ -811,5 +811,5 @@ async function displayXp(){
   const xpElement= document.getElementById("xp");
   const xp = await getXp();
   console.log(xp);
-  xpElement.innerHTML= xp ; 
+  xpElement.innerHTML= `<img src="xp.png" class="xpImg" /> ${xp}` ; 
 }
