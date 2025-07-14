@@ -6,7 +6,10 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     return window.location.href = 'login.html';
   }
+
+  await getTop15();
 });
+
 async function getTop15(){
   const sessionQuery= query(
     collection(db,"xp"),
