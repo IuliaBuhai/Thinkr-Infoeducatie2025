@@ -313,7 +313,7 @@
         </div>
 
         <div class="articles-grid">
-            <!-- Article 1 -->
+            
             <div class="article-card fade-in">
                 <div class="article-image">
                     <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Studiu eficient">
@@ -329,7 +329,7 @@
                 </div>
             </div>
 
-            <!-- Article 2 -->
+            
             <div class="article-card fade-in">
                 <div class="article-image">
                     <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Memorare">
@@ -345,7 +345,6 @@
                 </div>
             </div>
 
-            <!-- Article 3 -->
             <div class="article-card fade-in">
                 <div class="article-image">
                     <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Productivitate">
@@ -361,7 +360,6 @@
                 </div>
             </div>
 
-            <!-- Article 4 -->
             <div class="article-card fade-in">
                 <div class="article-image">
                     <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Planificare">
@@ -377,7 +375,7 @@
                 </div>
             </div>
 
-            <!-- Article 5 -->
+            
             <div class="article-card fade-in">
                 <div class="article-image">
                     <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Motivație">
@@ -399,15 +397,6 @@
         <p>© 2025 Thinkr. Toate drepturile rezervate.</p>
     </footer>
 
-    <script type="module">
-        import { auth, db } from './firebase.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-        
-        onAuthStateChanged(user => {
-            if(!user){
-                return window.location.href="login.html";
-            }
-        });
-    </script>
+    
 </body>
 </html>
