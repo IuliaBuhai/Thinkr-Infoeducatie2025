@@ -22,9 +22,8 @@ async function getTop15() {
   const leaderboard = document.getElementById("leaderboard");
   leaderboard.innerHTML = "";
 
-  // Create header row properly
   const headerRow = document.createElement("tr");
-  ["Nr.", "Nume", "XP"].forEach(text => {
+  ["Nr.", "Nume", "XP","Streak"].forEach(text => {
     const th = document.createElement("th");
     th.textContent = text;
     headerRow.appendChild(th);
@@ -48,6 +47,11 @@ async function getTop15() {
     xpTd.textContent = docData.xp;
     tr.appendChild(xpTd);
 
+    const streakTd = document.createElement("td");
+    const streak = await getStreak(docData.userId);
+    streakTd.textContent=streak;
+    tr.appendChild(streakTd);
+
     leaderboard.appendChild(tr);
   }
 }
@@ -66,4 +70,22 @@ async function getUserName(userId) {
   }
 
   return snapshot.docs[0].data().name;
+}
+
+async function getStreak(userId) {
+    const streakQuery= query(
+        collection(db, "studyStreak"), 
+        where("userId", "==" , userId),
+        limit(1)
+    )
+    const snapshot= await getDocs(streakQuery);
+
+    if(snapshot.empty){
+        return 0;
+    }else{
+        const data = snapshot.docs[0].data();
+        return data.currentStreak;
+    }
+
+    
 }
