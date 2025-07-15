@@ -1,918 +1,853 @@
-import { auth, db } from './firebase.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-storage.js";
-
-Chart.register(ChartDataLabels);
-
-
-let currentUser = null;
-let today = new Date();
-today.setHours(0, 0, 0, 0);
-
-let progressCircle = new ProgressBar.Circle("#goalProgressBar", {
-  color: '#4CAF50',
-  strokeWidth: 10,
-  trailWidth: 5,
-  easing: 'easeInOut',
-  duration: 1400,
-  text: {
-    autoStyleContainer: false
-  },
-  from: { color: '#ac4c4cff' },
-  to: { color: '#2a6f2cff' },
-  step: function(state, circle) {
-    circle.path.setAttribute("stroke", state.color);
-    let value = Math.round(circle.value() * 100);
-    circle.setText(`${value}%`);
-  }
-});
-
-
-const greetingElement = document.getElementById('greeting');
-const logoutBtn = document.getElementById('logoutBtn');
-const form = document.getElementById("StudyPlanForm");
-const loading = document.getElementById("loading");
-const output = document.getElementById("planOutput");
-const goalForm = document.getElementById('studyGoal');
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    return window.location.href = 'login.html';
-  }
-
-  currentUser = user;
-
-  try {
-   
-    const userSnap = await getDoc(doc(db, "users", user.uid));
-    if (userSnap.exists()) {
-      const { name = "Utilizator", username = "" } = userSnap.data();
-      greetingElement.textContent = `Bine ai venit, ${name} (${username})!`;
-    } else {
-      greetingElement.textContent = "Bine ai venit!";
-    }
-
-    displayPlansHistory();
-    initPlansForm();
-    initTimerLogic();
-    await displaySessionsHistory();
-    await updateProgressChart();
-    await loadTagSuggestions();
-    await loadTitleSuggestions();
-    await drawTimeDistributionChart();
-    await drawWeeklyChart();
-    await renderHeatmap();
-    displayXp();
-    displayStreak();
-  
-
-    // Set up logout
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        window.location.href = 'login.html';
-      } catch (err) {
-        console.error("Eroare la deconectare:", err);
-        alert("Eroare la deconectare: " + err.message);
-      }
-    });
-
-  } catch (error) {
-    console.error("Error initializing dashboard:", error);
-  }
-});
-
-
-function initPlansForm() {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const grade = document.getElementById("grade").value.trim();
-    const subject = document.getElementById("subject").value.trim();
-    const title = document.getElementById("title").value.trim();
-    const days = document.getElementById("days").value.trim();
-    const hours = document.getElementById("hours").value.trim();
-
-    const formData = {
-      grade,
-      subject,
-      title,
-      days: days ? Number(days) : null,
-      hours: hours ? Number(hours) : null
-    };
-
-    loading.style.display = "block";
-    output.innerHTML = "";
-
-    try {
-      const res = await fetch("/.netlify/functions/generatePlan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
-
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Eroare la generare plan");
-
-      await addDoc(collection(db, "studyPlans"), {
-        ...formData,
-        userId: currentUser.uid,
-        createdAt: new Date(),
-        plan: result.plan
-      });
-
-      displayPlansHistory();
-      //displayFormattedPlan(result.plan);
-    } catch (err) {
-      output.innerHTML = `<p style="color:red;">${err.message}</p>`;
-    } finally {
-      loading.style.display = "none";
-    }
-  });
-}
-
-function displayFormattedPlan(plan) {
-  output.innerHTML = "";
-  if (!plan || plan.length === 0) {
-    output.innerHTML = "<p>Planul este gol sau nu a fost generat corect.</p>";
-    return;
-  }
-
-  plan.forEach(day => {
-    const dayDiv = document.createElement("div");
-    dayDiv.innerHTML = `<h3>${day.day}</h3>`;
-    dayDiv.className = "plan-day";
-    const ul = document.createElement("ul");
-    day.tasks.forEach(task => {
-      const li = document.createElement("li");
-      li.className = "task";
-      li.innerHTML = `
-        <strong>${task.title}</strong>: ${task.description}
-        <em><span class="duration">(${task.duration} min)</span></em>
-      `;
-      ul.appendChild(li);
-    });
-    dayDiv.appendChild(ul);
-    output.appendChild(dayDiv);
-  });
-}
-
-async function displayPlansHistory() {
-  const plans = query(
-    collection(db, "studyPlans"),
-    where("userId", "==", currentUser.uid),
-    orderBy("createdAt", "desc")
-  );
-
-  const snapshot = await getDocs(plans);
-  const displayHistory = document.getElementById("displayHistory");
-  displayHistory.innerHTML = '';
-
-  if (snapshot.empty) {
-    displayHistory.innerHTML = "<p>Nu există planuri în istoric.</p>";
-    return;
-  }
-
-  const dl = document.createElement("dl");
-  dl.className = "history";
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const dt = document.createElement("dt");
-    dt.innerHTML = `<b>${data.subject}</b>-${data.title}`;
-
-    const dd = document.createElement("dd");
-    const createdAtDate = data.createdAt instanceof Date
-      ? data.createdAt
-      : data.createdAt?.toDate?.() || new Date(0);
-    dd.innerHTML = `creat la: ${createdAtDate.toLocaleDateString()}`;
-
-    dl.appendChild(dt);
-    dl.appendChild(dd);
-  });
-
-  displayHistory.appendChild(dl);
-}
-
-
-async function displaySessionsHistory() {
-  const sessions = query(
-    collection(db, "studySessions"),
-    where("userId", "==", currentUser.uid),
-    orderBy("createdAt", "desc")
-  );
-
-  const snapshot = await getDocs(sessions);
-  const displaySessHistory = document.getElementById("displaySessions");
-  displaySessHistory.innerHTML = "";
-  const dl = document.createElement("dl");
-  dl.className = "sessHistory";
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const dt = document.createElement("dt");
-    const dd = document.createElement("dd");
-    const seconds = data.seconds;
-    let result = "";
-    let hours, mins, sec;
-    hours = Math.floor(seconds / 3600);
-    mins = Math.floor((seconds % 3600) / 60);
-    sec = seconds % 60;
-
-    result = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    dt.innerHTML = `<b>${data.tag}</b> ->${data.title}(<span class="duration">${result}</span> ) `;
-
-    const description = data.description ? data.description : "";
-    dd.textContent = `${description}`;
-
-    dl.appendChild(dt);
-    dl.appendChild(dd);
-  });
-
-  displaySessHistory.appendChild(dl);
-}
-
-
-function initTimerLogic() {
-  const timeDisplay = document.getElementById('time');
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const submitBtn = document.getElementById('stopBtn');
-  const resetBtn = document.getElementById('resetBtn');
-  
-  let seconds = 0;
-  let running = false;
-  let intervalId;
-
-  startBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (!running) {
-      running = true;
-      intervalId = setInterval(() => {
-        seconds++;
-        updateTimeDisplay();
-      }, 1000);
-    }
-  });
-
-  pauseBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    running = false;
-    clearInterval(intervalId);
-  });
-  
-  submitBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    running = false;
-    clearInterval(intervalId);
-    startBtn.disabled = true;
-
-    const title = document.getElementById('sessionTitle').value.trim();
-    const description = document.getElementById('sessionDescription').value.trim();
-    const tag = document.getElementById('sessionTag').value.trim();
-    
-    await addDoc(collection(db, "studySessions"), {
-      userId: currentUser.uid,
-      createdAt: new Date(),
-      seconds,
-      title,
-      description,
-      tag
-    });
-
-    displaySessionsHistory();
-    updateProgressChart();
-    await loadTagSuggestions();
-    await loadTitleSuggestions();
-    await drawTimeDistributionChart();
-    await drawWeeklyChart();
-    await displayXp();
-    if(seconds >= 1200) await updateStudyStreak();
-    alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză");
-  });
-
-  resetBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    running = false;
-    clearInterval(intervalId);
-    seconds = 0;
-    timeDisplay.textContent = '00:00:00';
-    startBtn.disabled = false;
-  });
-  
-  function updateTimeDisplay() {
-    let hours = Math.floor(seconds / 3600);
-    let mins = Math.floor((seconds % 3600) / 60);
-    let sec = seconds % 60;
-
-    const result = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    timeDisplay.textContent = result;
-  }
-}
-
-
-goalForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  let goal = document.getElementById('timeGoal').value.trim();
-  let parts = goal.split(":");
-  let hours = parseInt(parts[0]);
-  let minutes = parseInt(parts[1]);
-  let seconds = 60 * minutes + 3600 * hours;
-  
-  const prevGoal = query(
-    collection(db, "studyGoal"),
-    where("userId", "==", currentUser.uid),
-    where("date", ">=", today)
-  );
-  
-  const snapshot = await getDocs(prevGoal);
-
-  if (snapshot.empty) {
-    await addDoc(collection(db, "studyGoal"), {
-      userId: currentUser.uid,
-      goal: seconds,
-      date: new Date(),
-    });
-    alert("Obiectiv salvat cu succes!");
-  } else {
-    const docRef = snapshot.docs[0].ref;
-    await updateDoc(docRef, {
-      goal: seconds,
-      date: new Date()
-    });
-    alert("Obiectiv actualizat cu succes!");
-  }
-
-  updateProgressChart();
-  
-});
-
-
-async function getTodayStudyTime() {
-  let todayStudyTime = 0;
-  let todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-
-  let tomorrowStart = new Date(todayStart);
-  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-  const sessionsToday = query(
-    collection(db, "studySessions"),
-    where("userId", "==", currentUser.uid),
-    where("createdAt", ">=", todayStart),
-    where("createdAt", "<", tomorrowStart)
-  );
-
-  const snapshot = await getDocs(sessionsToday);
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    todayStudyTime += data.seconds || 0;
-  });
-
-  return todayStudyTime;
-}
-
-function formatTime(time) {
-  let hours = Math.floor(time / 3600);
-  let minutes = Math.floor((time % 3600) / 60);
-  let seconds = Math.floor(time % 60);
-
-  let result = `${hours.toString().padStart(2, 0)}:${minutes.toString().padStart(2, 0)}:${seconds.toString().padStart(2, 0)}`;
-  return result;
-}
-
-async function loadTagSuggestions() {
-  const sessionsQuery = query(
-    collection(db, "studySessions"),
-    where("userId", "==", currentUser.uid)
-  );
-
-  const snapshot = await getDocs(sessionsQuery);
-  const tagSet = new Set();
-  snapshot.forEach(doc => {
-    const tag = doc.data().tag?.trim();
-    if (tag) tagSet.add(tag);
-  });
-
-  const tagSuggestions = document.getElementById("tagSuggestions");
-  tagSuggestions.innerHTML = "";
-
-  tagSet.forEach(tag => {
-    const option = document.createElement("option");
-    option.value = tag;
-    tagSuggestions.appendChild(option);
-  });
-}
-
-async function loadTitleSuggestions() {
-  const sessionsQuery = query(
-    collection(db, "studySessions"),
-    where("userId", "==", currentUser.uid)
-  );
-
-  const snapshot = await getDocs(sessionsQuery);
-  const titleSet = new Set();
-
-  snapshot.forEach(doc => {
-    const title = doc.data().title?.trim();
-    if (title) titleSet.add(title);
-  });
-
-  const titleSuggestions = document.getElementById("titleSuggestions");
-  titleSuggestions.innerHTML = "";
-
-  titleSet.forEach(tag => {
-    const option = document.createElement("option");
-    option.value = tag;
-    titleSuggestions.appendChild(option);
-  });
-}
-
-
-async function updateProgressChart() {
-  try {
-    const todayStudyTime = await getTodayStudyTime();
-    const goalToday = query(
-      collection(db, "studyGoal"),
-      where("userId", "==", currentUser.uid),
-      orderBy("date", "desc"),
-      limit(1)
-    );
-
-    const snapshot = await getDocs(goalToday);
-    
-    if (snapshot.empty) {
-      console.warn("No study goal found for today.");
-      progressCircle.set(0);
-      document.getElementById('goalProgressLabel').textContent = "0%";
-      document.getElementById('progressText').textContent = "Nu ai setat un obiectiv";
-      document.getElementById('progressText').style.color = "var(--text-secondary)";
-      document.getElementById('progressComparison').textContent = "";
-      return;
-    }
-
-    const goalData = snapshot.docs[0].data();
-    const goal = goalData.goal || 1;
-    const progress = Math.min(todayStudyTime / goal, 1); 
-
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    const prevWeekGoal = await getDocs(query(
-      collection(db, "studyGoal"),
-      where("userId", "==", currentUser.uid),
-      where("date", ">=", weekAgo),
-      where("date", "<", today),
-      orderBy("date", "desc"),
-      limit(1)
-    ));
-
-    let comparisonText = "";
-    if (!prevWeekGoal.empty) {
-      const prevGoal = prevWeekGoal.docs[0].data().goal;
-      const difference = ((todayStudyTime - prevGoal) / prevGoal) * 100;
-      comparisonText = difference >= 0 
-        ? `+${Math.round(difference)}% față de săptămâna trecută` 
-        : `${Math.round(difference)}% față de săptămâna trecută`;
-    }
-
-    
-    document.getElementById('progressComparison').textContent = comparisonText;
-    
-    progressCircle.animate(progress, {
-      duration: 1500,
-      step: (state, circle) => {
-        const value = Math.round(circle.value() * 100);
-        document.getElementById('goalProgressLabel').textContent = `${value}%`;
-        
-        
-        const progressText = document.getElementById('progressText');
-        if (value < 30) {
-          progressText.textContent = 'Începe să studiezi';
-          progressText.style.color = 'var(--danger)';
-        } else if (value < 70) {
-          progressText.textContent = 'Continuă așa!';
-          progressText.style.color = 'var(--warning)';
-        } else {
-          progressText.textContent = 'Excelent!';
-          progressText.style.color = 'var(--success)';
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Thinkr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f0f13;
+            --bg-darker: #07070a;
+            --bg-card: #1a1a24;
+            --accent-blue: #4d8eff;
+            --accent-purple: #8a63ff;
+            --accent-cyan: #00e0ff;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --success: #2dd4a7;
+            --warning: #ffb74d;
+            --danger: #ff6b6b;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.35);
+            --border-radius: 12px;
+            --glass-effect: rgba(30, 30, 45, 0.6);
         }
-      }
-    });
 
-  } catch (error) {
-    console.error("Error updating progress chart:", error);
-  }
-}
-
-async function drawTimeDistributionChart() {
-  try {
-    document.getElementById('distributionLoader').style.display = 'flex';
-    
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const tomorrowStart = new Date(todayStart);
-    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-
-    const sessionsToday = await getDocs(query(
-      collection(db, "studySessions"),
-      where("userId", "==", currentUser.uid),
-      where("createdAt", ">=", todayStart),
-      where("createdAt", "<", tomorrowStart)
-    ));
-
-    const tagDurations = {};
-    sessionsToday.forEach(doc => {
-      const data = doc.data();
-      const tag = data.tag || "Altele";
-      tagDurations[tag] = (tagDurations[tag] || 0) + (data.seconds || 0);
-    });
-
-    const labels = Object.keys(tagDurations);
-    const data = Object.values(tagDurations).map(sec => (sec / 60).toFixed(1));
-
-  
-    const generateColors = (count) => {
-      const colors = [];
-      const hueStep = 360 / count;
-      for (let i = 0; i < count; i++) {
-        colors.push(`hsl(${i * hueStep}, 70%, 60%)`);
-      }
-      return colors;
-    };
-
-    const ctx = document.getElementById('timeDistributionChart').getContext('2d');
-    if (window.timeChart) window.timeChart.destroy();
-    
-    window.timeChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: generateColors(labels.length),
-          borderWidth: 0,
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%',
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              color: 'var(--text-primary)',
-              padding: 20,
-              font: {
-                family: 'Inter'
-              },
-              usePointStyle: true
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const total = context.dataset.data.reduce((a, b) => a + parseFloat(b), 0);
-                const value = parseFloat(context.raw);
-                const percentage = Math.round((value / total) * 100);
-                return `${context.label}: ${value} min (${percentage}%)`;
-              }
-            }
-          },
-          datalabels: {
-            formatter: (value, context) => {
-              const total = context.chart.data.datasets[0].data.reduce((a, b) => a + parseFloat(b), 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${percentage}%`;
-            },
-            color: 'white',
-            font: {
-              weight: 'bold'
-            }
-          }
-        },
-        animation: {
-          animateScale: true,
-          animateRotate: true
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      },
-      plugins: [ChartDataLabels]
-    });
 
-  } catch (error) {
-    console.error("Error drawing time distribution chart:", error);
-  } finally {
-    document.getElementById('distributionLoader').style.display = 'none';
-  }
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(77, 142, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(138, 99, 255, 0.15) 0%, transparent 50%);
+        }
 
-async function drawWeeklyChart() {
-  console.log('drawWeeklyChart creat:', new Date().toISOString());
-  try {
-    document.getElementById('weeklyLoader').style.display = 'flex';
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const weekStart = new Date(today);
-    weekStart.setDate(weekStart.getDate() - 6); 
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.5px;
+        }
 
-    const sessions = await getDocs(query(
-      collection(db, "studySessions"),
-      where("userId", "==", currentUser.uid),
-      where("createdAt", ">=", weekStart),
-      where("createdAt", "<=", today)
-    ));
+        h1 { 
+            font-size: 2.75rem; 
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
- 
-    const dailyTotals = {};
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateKey = date.toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric' });
-      dailyTotals[dateKey] = 0;
-    }
+        h2 { 
+            font-size: 2rem; 
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
 
-    
-    sessions.forEach(doc => {
-      const sessionDate = doc.data().createdAt.toDate();
-      const dateKey = sessionDate.toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric' });
-      dailyTotals[dateKey] += doc.data().seconds || 0;
-    });
+        h2:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 3px;
+        }
 
- 
-    const labels = [];
-    const data = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateKey = date.toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric' });
-      labels.push(dateKey);
-      data.push((dailyTotals[dateKey] / 60).toFixed(1)); 
-    }
+        h3 { font-size: 1.5rem; }
 
-    const ctx = document.getElementById('weeklyStudyChart').getContext('2d');
-    if (window.weeklyChart) window.weeklyChart.destroy();
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+            line-height: 1.7;
+        }
 
-    window.weeklyChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Ore de studiu',
-          data: data,
-          backgroundColor: (context) => {
-            const chart = context.chart;
-            const { ctx, chartArea } = chart;
-            if (!chartArea) return;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background-color: var(--glass-effect);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .card {
+            background: var(--glass-effect);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(77, 142, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover:before {
+            opacity: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        #greeting {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeIn 0.8s ease, float 6s ease-in-out infinite;
+            position: relative;
+        }
+
+        button, input[type="submit"], input[type="button"] {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 0.85rem 1.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: var(--transition);
+            margin: 0.25rem;
+            box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:after, input[type="submit"]:after, input[type="button"]:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+        }
+
+        button:hover:after, input[type="submit"]:hover:after, input[type="button"]:hover:after {
+            transform: translateX(0);
+        }
+
+        button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(77, 142, 255, 0.4);
+        }
+
+        button:active, input[type="submit"]:active, input[type="button"]:active {
+            transform: translateY(1px);
+        }
+
+        #logoutBtn {
+            background: var(--danger);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        #logoutBtn:hover {
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        #startBtn { 
+            background: var(--success);
+            box-shadow: 0 4px 15px rgba(45, 212, 167, 0.3);
+        }
+        #pauseBtn { 
+            background: var(--warning);
+            box-shadow: 0 4px 15px rgba(255, 183, 77, 0.3);
+        }
+        #stopBtn { 
+            background: var(--danger);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        #resetBtn { 
+            background: var(--bg-card);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="time"],
+        input[type="password"],
+        input[type="email"],
+        textarea,
+        input,
+        select {
+            width: 100%;
+            padding: 0.85rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(10, 10, 15, 0.5);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(77, 142, 255, 0.2);
+            background: rgba(10, 10, 15, 0.7);
+        }
+
+        #time {
+            font-size: 3.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--accent-cyan);
+            background: rgba(0, 224, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+            border: 1px solid rgba(0, 224, 255, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        #goalProgressContainer {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 2rem;
+            background: var(--glass-effect);
+            border-radius: 50%;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #goalProgressLabel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .chart-container {
+            background: var(--glass-effect);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history, .sessHistory {
+            background: var(--glass-effect);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history dt, .sessHistory dt {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .history dt:before, .sessHistory dt:before {
+            content: '→';
+            color: var(--accent-purple);
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+
+        .history dd, .sessHistory dd {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+            border-left: 2px solid var(--accent-purple);
+            font-weight: 300;
+        }
+
+        .plan-day {
+            margin-bottom: 2rem;
+            background: var(--glass-effect);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .plan-day:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .plan-day h3 {
+            font-size: 1.3rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(138, 99, 255, 0.3);
+            display: flex;
+            align-items: center;
+        }
+
+        .plan-day h3:before {
+            content: '📅';
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .plan-day ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .plan-day li.task {
+            background: rgba(10, 10, 15, 0.5);
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            color: var(--text-primary);
+            transition: var(--transition);
+            border-left: 4px solid var(--accent-blue);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plan-day li.task:hover {
+            background: rgba(77, 142, 255, 0.1);
+            transform: translateX(5px);
+            border-left-color: var(--accent-purple);
+        }
+
+        .plan-day li.task strong {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+        }
+
+        .plan-day li.task em {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-day li.task .duration {
+            background-color: var(--success);
+            border-radius: 20px;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 0.3rem;
+            align-self: flex-start;
+            font-style: normal;
+            font-weight: 500;
+        }
+        .logo-container {
+            text-align: center;
+        }
+
+        .logo {
+            height: 2rem; 
+            width: auto;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: translateY(-3px);
+        }
+
+        .chart-container {
+          position: relative;
+          height: 600px;
+          width: 100%;
+          max-width: 700px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+            border-left: 3px solid var(--accent-purple);
+            padding-left: 1.25rem;
+            font-size: 1.05rem;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--accent-cyan);
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        #searchForm {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        #searchPlan {
+            flex-grow: 1;
+            background: rgba(10, 10, 15, 0.7);
+        }
+
+        #weeklyStudyChart {
+          width: 100%;
+          height: 300px !important;  
+          max-width: 600px !important; 
+          overflow: hidden;
+        }
+
+        .fab {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            font-size: 1.5rem;
+            border: none;
+            box-shadow: 0 6px 20px rgba(77, 142, 255, 0.4);
+            z-index: 90;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .fab:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 30px rgba(77, 142, 255, 0.5);
+        }
+
+        .heatmap-day {
+          width: 1rem;
+          height: 1rem;
+          border-radius: 3px;
+          transition: background-color 0.3s;
+          margin-top: 0.4rem;
+        }
+
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            #greeting {
+                margin-bottom: 1rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #time {
+                font-size: 2.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button, input[type="submit"], input[type="button"] {
+                width: 100%;
+            }
+
+            .fab {
+                display: flex;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--accent-blue), var(--accent-purple));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-purple);
+        }
+
+        [data-tooltip] {
+            position: relative;
+        }
+
+        [data-tooltip]:hover:after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            box-shadow: var(--shadow);
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input, input * {
+          pointer-events: auto !important;
+          position:relative;
+          z-index: 1000;
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
+        #xp{
+            background: linear-gradient(135deg, var(--warning), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 1.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: "Michroma", sans-serif;
+            font-weight: 500;
+            font-size: 1.8rem;
+            transition: var(--transition);
+            margin: 0.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: fit-content;
+        }
+        .xpImg{
+            height:2.3rem;
+            width: 2.3rem
+        }
+        #streak{
+            background: linear-gradient(135deg, var(--warning), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 1.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: "Michroma", sans-serif;
+            font-weight: 500;
+            font-size: 1.8rem;
+            transition: var(--transition);
+            margin: 0.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: fit-content;
+        }
+        .streakImg{
+            height:2.3rem;
+            width: 2.3rem
+        }
+        #message{
+            background-color: var(--warning);
+            color:var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+        <div class="logo-container">
+            <img src="logo1.png" alt="Thinkr Logo" class="logo">
+        </div>
+        <div id="greeting">Bine ai venit!</div>
+    </div>
+    <a href="planer.html"><button>PlanneR</button></a>
+    <a href="styles.html"><button>Teste</button></a>
+    <a href="index.html"><button>Acasa</button></a>
+    <a href="articole.html"><button>Articole</button></a>
+    <button id="logoutBtn">Logout</button>
+</header>
+
+    <div class="container">
+        <section class="card fade-in">
+            <h2>Progresul tău</h2>
+            <p class="section-description">Urmărește-ți progresul zilnic și vezi cât de aproape ești de atingerea obiectivului tău.</p>
             
-            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            gradient.addColorStop(0, 'rgba(77, 142, 255, 0.2)');
-            gradient.addColorStop(1, 'rgba(77, 142, 255, 0.8)');
-            return gradient;
-          },
-          borderColor: 'rgba(77, 142, 255, 1)',
-          borderWidth: 1,
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.05)'
-            },
-            ticks: {
-              color: 'var(--text-secondary)',
-              callback: (value) => `${value} min`
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              color: 'var(--text-secondary)'
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const hours = (context.raw / 60).toFixed(1);
-                return `${hours} ore`;
-              }
-            }
-          }
-        },
-        animation: false,
-      }
-    });
+            <div class="card-grid">
+                <div class="card pulse">
+                    <h3>Obiectiv zilnic</h3>
+                    <div id="goalProgressContainer">
+                        <div id="goalProgressBar"></div>
+                        <div id="goalProgressLabel"></div>
+                    </div>
+                    <div id="progressText" style="text-align: center; margin: 1rem 0; font-weight: 500;"></div>
+                    <div id="progressComparison" style="text-align: center; font-size: 0.9rem; color: var(--text-secondary);"></div>
+                    <form id="studyGoal">
+                        <input type="time" id="timeGoal" required />
+                        <button type="submit">Setează target</button>
+                    </form>
+                </div>
 
-  } catch (error) {
-    console.error("Error drawing weekly chart:", error);
-  } finally {
-    document.getElementById('weeklyLoader').style.display = 'none';
-  }
-}
+                <div class="card chart-container">
+                    <h3>Distribuția timpului</h3>
+                    <div id="distributionLoader" style="display: none; justify-content: center; align-items: center; height: 200px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
+                            <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
+                            <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
+                        </svg>
+                        <span style="margin-left: 0.75rem;">Se încarcă datele...</span>
+                    </div>
+                    <canvas id="timeDistributionChart"></canvas>
+                </div>
 
-async function renderHeatmap() {
-  try {
-    const heatmap = document.getElementById('studyHeatmap');
-    heatmap.innerHTML = '';
+                <div class="card chart-container">
+                    <h3>Evoluția săptămânală</h3>
+                    <div id="weeklyLoader" style="display: none; justify-content: center; align-items: center; height: 200px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
+                            <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
+                            <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
+                        </svg>
+                        <span style="margin-left: 0.75rem;">Se încarcă datele...</span>
+                    </div>
+                    <canvas id="weeklyStudyChart"></canvas>
+                </div>
+            </div>
+        </section>
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const twelveWeeksAgo = new Date(today);
-    twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 84); 
-
+        <section class="card fade-in">
+            <h2>Activitatea ta</h2>
+            <p>XP-ul tău adunat de-a lungul timpului(10 minute de studiu = 1XP) </p>
+            <button id="xp"><img src="xp.png" class="xpImg" /> Se încarcă</button>
+            <p>Streak-ul tău</p>
+            <button id="streak"><img src="streak.png" class="streakImg" /> Se încarcă..</button>
+            <p id="message"></p>
+            <p class="section-description">Vizualizează-ți activitatea de studiu din ultimele 12 săptămâni.</p>
+            <div id="studyHeatmap" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 0px; margin-top: 1.5rem;">
+                
+            </div>
     
-    const sessions = await getDocs(query(
-      collection(db, "studySessions"),
-      where("userId", "==", currentUser.uid),
-      where("createdAt", ">=", twelveWeeksAgo),
-      where("createdAt", "<=", today)
-    ));
+        </section>
 
-    
-    const sessionsByDate = {};
-    sessions.forEach(doc => {
-      const sessionDate = doc.data().createdAt.toDate();
-      const dateKey = sessionDate.toISOString().split('T')[0]; // YYYY-MM-DD
-      sessionsByDate[dateKey] = (sessionsByDate[dateKey] || 0) + (doc.data().seconds || 0);
-    });
+        <section class="card fade-in">
+            <h2>Sesiuni de studiu</h2>
+            <p class="section-description">Începe o nouă sesiune de studiu și urmărește-ți progresul în timp real.</p>
+            
+            <form id="clock">
+                <div id="time">00:00:00</div>
+                <input list="titleSuggestions" id="sessionTitle" placeholder="Titlu sesiune (ce înveți la materia selectată)" required />
+                <datalist id="titleSuggestions"></datalist>
+                <input type="text" id="sessionDescription" placeholder="Detalii sesiune (ce ai învățat, ce ai reușit să faci etc.) - opțional" />
+                <input list="tagSuggestions" id="sessionTag" placeholder="Materia">
+                <datalist id="tagSuggestions"></datalist>
+                
+                <div class="button-group">
+                    <button id="startBtn" type="button" data-tooltip="Începe sesiunea">Start</button>
+                    <button id="pauseBtn" type="button" data-tooltip="Pauză temporară">Pauză</button>
+                    <button type="submit" id="stopBtn" data-tooltip="Finalizează sesiunea">Stop</button>
+                    <button type="reset" id="resetBtn" data-tooltip="Resetează timerul">Resetează</button>
+                </div>
+            </form>
+        </section>
 
-    
-    for (let week = 0; week < 12; week++) {
-      const weekDiv = document.createElement('div');
-      weekDiv.style.display = 'block';
-      
-      for (let day = 0; day < 7; day++) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - (12 - week) * 7 + day);
-        const dateKey = date.toISOString().split('T')[0];
-        const minutes = Math.floor((sessionsByDate[dateKey] || 0) / 60);
+        <section class="card fade-in">
+            <h2>Istoric sesiuni</h2>
+            <p class="section-description">Toate sesiunile tale de studiu, organizate cronologic.</p>
+            <section id="displaySessions"></section>
+        </section>
 
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'heatmap-day';
+        <section class="card fade-in">
+            <h2>Planuri de studiu</h2>
+            <p class="section-description">Generează un plan personalizat de studiu bazat pe nevoile tale.</p>
+            
+            <form id="StudyPlanForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label for="grade">Clasa</label>
+                        <input type="text" id="grade" placeholder="Ex: 9" required />
+                    </div>
+                    <div>
+                        <label for="subject">Materia</label>
+                        <input type="text" id="subject" placeholder="Ex: Matematică" required />
+                    </div>
+                </div>
+                
+                <label for="title">Lecție / Subiect</label>
+                <input type="text" id="title" placeholder="Ce vrei să înveți? (Ex: Ecuații de gradul II)" required />
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                    <div>
+                        <label for="days">Zile disponibile</label>
+                        <input type="number" id="days" placeholder="Ex: 5" />
+                    </div>
+                    <div>
+                        <label for="hours">Ore/zi</label>
+                        <input type="number" id="hours" placeholder="Ex: 2" />
+                    </div>
+                </div>
+
+                <button type="submit" style="margin-top: 1.5rem;">Generează plan</button>
+            </form>
+
+            <div id="loading">
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 0.75rem; animation: spin 1s linear infinite;">
+                    <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
+                    <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
+                </svg>
+                Se generează planul...
+            </div>
+
+            <section id="planOutput"></section>
+            
+            <form id="searchForm">
+                <input type="text" id="searchPlan" placeholder="Caută plan după materie, clasă etc.">
+                <button type="submit">Caută</button>
+            </form>
+
+            <h3 style="margin-top: 2.5rem;">Istoric planuri</h3>
+            <p class="section-description">Planurile tale de studiu generate anterior.</p>
+            <section id="displayHistory"></section>
+        </section>
+    </div>
+
+    <button class="fab" id="mobileFab">+</button>
+
+    <script>
         
-        let intensity;
-        if (minutes === 0) intensity = 0;
-        else if (minutes < 30) intensity = 1;
-        else if (minutes < 60) intensity = 2;
-        else if (minutes < 120) intensity = 3;
-        else intensity = 4;
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
         
-        dayDiv.style.backgroundColor = `rgba(77, 142, 255, ${0.2 + intensity * 0.2})`;
-        dayDiv.setAttribute('data-tooltip', `${date.toLocaleDateString('ro-RO')}: ${minutes} minute`);
-        
-        weekDiv.appendChild(dayDiv);
-      }
-      heatmap.appendChild(weekDiv);
-    }
-
-  } catch (error) {
-    console.error("Error rendering heatmap:", error);
-  }
-}
-
-async function getTotalStudyTime(){
-
-    const sessionsQuery= query(
-        collection(db, "studySessions"), 
-        where("userId", "==", currentUser.uid)
-    );
-
-    const snapshot= await getDocs(sessionsQuery);
-
-    let totalStudyTime = 0;
-
-    snapshot.forEach(doc => {
-        const data= doc.data();
-        const sessionDuration = parseInt(data.seconds);
-        totalStudyTime+=sessionDuration;
-
-
-    });
-
-    return totalStudyTime;
-
-}
-
-async function getXp(){
-      const totalStudyTime = await getTotalStudyTime();
-      const xp = Math.floor(totalStudyTime /600); // 10 minute= 1xp
-      return xp;
-}
-
-async function displayXp(){
-  const xpElement= document.getElementById("xp");
-  const xp = await getXp();
-  console.log(xp);
-  xpElement.innerHTML= `<img src="xp.png" class="xpImg" /> ${xp}XP` ; 
-
-  await storeXp();
-}
-
-
-async function storeXp(){
-  const getXpValue = await getXp();
-  const xp = isNaN(getXpValue)? 0 : getXpValue;
-
-  const prevXp= query(
-    collection(db, "xp"),
-    where("userId", "==", currentUser.uid)
-  )
-
-  const snapshot= await getDocs(prevXp);
-
-  if(snapshot.empty){
-    await addDoc(collection(db, "xp"),{
-      userId :currentUser.uid,
-      xp: xp
-  });
-}else{
-  const docRef = snapshot.docs[0].ref;
-  await updateDoc(docRef, {
-    xp:xp
-  })
-    }
-}
-
-
-async function updateStudyStreak(){
-  const today = new Date().toISOString().split('T')[0];
-
-  const streakData = query(
-    collection(db, "studyStreak"),
-    where("userId", "==", currentUser.uid)
-  );
-
-  const snapshot = await getDocs(streakData);
-  if(snapshot.empty){
-    await addDoc(collection(db,"studyStreak"), {
-      userId:currentUser.uid,
-      lastDate : today,
-      currentStreak:1,
-      longestStreak:1
-    })
-    return;
-  };
-  const docRef= snapshot.docs[0].ref;
-  const data= snapshot.docs[0].data();  
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  const streak= data.currentStreak +1;
-  const longestStreak = Math.max(data.longestStreak, streak)
-  if(data.lastDate === yesterday){
-    await updateDoc(docRef,{
-      lastDate:today,
-      currentStreak: streak,
-      longestStreak: longestStreak
-    });
-  }else{
-    await updateDoc(docRef,{
-      lastDate: today,
-      currentStreak: 1,
-      longestStreak: data.longestStreak
-    });
-  }
-  
-  await displayStreak();
-}
-
-async function displayStreak() {
-  const displayStr = document.getElementById("streak");
-  const message = document.getElementById("streakWarning")
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-
-  const streakData = query(
-    collection(db, "studyStreak"),
-    where("userId", "==", currentUser.uid)
-  );
-
-  const snapshot = await getDocs(streakData);
-
-  let streak = 0;
-  if (!snapshot.empty) {
-    const data = snapshot.docs[0].data();
-
-    if (data.lastDate === today) {
-      streak = data.currentStreak;
-
-    } else if (data.lastDate === yesterday) {
-      streak = data.currentStreak;
-      message.innerHTML="Studiază minim 20 de minute azi pentru a menține streak-ul. Dacă nu reușești să înregistrezi azi o sesiune, streak-ul tău se va reseta."
-    }
-    
-  }
-
-  displayStr.innerHTML = `<img src="streak.png" class="streakImg" /> ${streak}`;
-}
+        document.getElementById('mobileFab').addEventListener('click', function() {
+          
+        document.querySelector('#clock').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+    <script type="module" src="dashboard.js"></script>
+    <script type="module" src="plans.js"></script>
+</body>
+</html>
