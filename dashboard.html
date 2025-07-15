@@ -644,7 +644,32 @@
             height:2.3rem;
             width: 2.3rem
         }
-
+        #streak{
+            background: linear-gradient(135deg, var(--warning), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 1.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: "Michroma", sans-serif;
+            font-weight: 500;
+            font-size: 1.8rem;
+            transition: var(--transition);
+            margin: 0.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: fit-content;
+        }
+        .streakImg{
+            height:2.3rem;
+            width: 2.3rem
+        }
+        #message{
+            background-color: var(--warning);
+            color:var(--danger);
+        }
     </style>
 </head>
 <body>
@@ -711,7 +736,10 @@
         <section class="card fade-in">
             <h2>Activitatea ta</h2>
             <p>XP-ul tău adunat de-a lungul timpului(10 minute de studiu = 1XP) </p>
-            <button id="xp"><img src="xp.png" class="xpImg" /> 20 XP</button>
+            <button id="xp"><img src="xp.png" class="xpImg" /> Se încarcă</button>
+            <p>Streak-ul tău</p>
+            <button id="streak"><img src="streak.png" class="streakImg" /> Se încarcă..</button>
+            <p id="message"></p>
             <p class="section-description">Vizualizează-ți activitatea de studiu din ultimele 12 săptămâni.</p>
             <div id="studyHeatmap" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 0px; margin-top: 1.5rem;">
                 
