@@ -19,8 +19,8 @@ let progressCircle = new ProgressBar.Circle("#goalProgressBar", {
   text: {
     autoStyleContainer: false
   },
-  from: { color: '#FF5252' },
-  to: { color: '#4CAF50' },
+  from: { color: '#ac4c4cff' },
+  to: { color: '#2a6f2cff' },
   step: function(state, circle) {
     circle.path.setAttribute("stroke", state.color);
     let value = Math.round(circle.value() * 100);
@@ -64,6 +64,8 @@ onAuthStateChanged(auth, async (user) => {
     await drawWeeklyChart();
     await renderHeatmap();
     displayXp();
+    displayStreak();
+  
 
     // Set up logout
     logoutBtn.addEventListener("click", async () => {
@@ -286,6 +288,7 @@ function initTimerLogic() {
     await drawTimeDistributionChart();
     await drawWeeklyChart();
     await displayXp();
+    if(seconds >= 1200) await updateStudyStreak();
     alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză");
   });
 
@@ -342,6 +345,7 @@ goalForm.addEventListener("submit", async (e) => {
   }
 
   updateProgressChart();
+  
 });
 
 
@@ -840,4 +844,75 @@ async function storeXp(){
     xp:xp
   })
     }
+}
+
+
+async function updateStudyStreak(){
+  const today = new Date().toISOString().split('T')[0];
+
+  const streakData = query(
+    collection(db, "studyStreak"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(streakData);
+  if(snapshot.empty){
+    await addDoc(collection(db,"studyStreak"), {
+      userId:currentUser.uid,
+      lastDate : today,
+      currentStreak:1,
+      longestStreak:1
+    })
+    return;
+  };
+  const docRef= snapshot.docs[0].ref;
+  const data= snapshot.docs[0].data();  
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const streak= data.currentStreak +1;
+  const longestStreak = Math.max(data.longestStreak, streak)
+  if(data.lastDate === yesterday){
+    await updateDoc(docRef,{
+      lastDate:today,
+      currentStreak: streak,
+      longestStreak: longestStreak
+    });
+  }else{
+    await updateDoc(docRef,{
+      lastDate: today,
+      currentStreak: 1,
+      longestStreak: data.longestStreak
+    });
+  }
+  
+  await displayStreak();
+}
+
+async function displayStreak() {
+  const displayStr = document.getElementById("streak");
+  const message = document.getElementById("streakWarning")
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+  const streakData = query(
+    collection(db, "studyStreak"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(streakData);
+
+  let streak = 0;
+  if (!snapshot.empty) {
+    const data = snapshot.docs[0].data();
+
+    if (data.lastDate === today) {
+      streak = data.currentStreak;
+
+    } else if (data.lastDate === yesterday) {
+      streak = data.currentStreak;
+      message.innerHTML="Studiază minim 20 de minute azi pentru a menține streak-ul. Dacă nu reușești să înregistrezi azi o sesiune, streak-ul tău se va reseta."
+    }
+    
+  }
+
+  displayStr.innerHTML = `<img src="streak.png" class="streakImg" /> ${streak}`;
 }
