@@ -1016,7 +1016,7 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
     e.preventDefault();
     running = false;
     clearInterval(timer);
-    updateAndStoreSession();
+    await updateAndStoreSession();
     alert("Sesiune pomodoro oprită");
     pomodoroInstance = null;
   });
