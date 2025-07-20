@@ -1012,7 +1012,7 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
     clearInterval(timer);
   });
 
-  stopBtn.addEventListener("click", (e) => {
+  stopBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     running = false;
     clearInterval(timer);
