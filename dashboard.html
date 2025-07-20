@@ -670,6 +670,21 @@
             background-color: var(--warning);
             color:var(--danger);
         }
+
+        .pomodoro-settings {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          margin-bottom: 1rem;
+        }
+        
+        #timePomodoro {
+          font-size: 2rem;
+          text-align: center;
+          margin: 1rem 0;
+          font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
@@ -767,6 +782,32 @@
                 </div>
             </form>
         </section>
+
+        <section class="card fade-in">
+              <h2>Pomodoro Timer</h2>
+              <p class="section-description">Concentrează-te folosind tehnica Pomodoro — alternează între sesiuni de lucru și pauze.</p>
+            
+              <!-- Pomodoro Settings -->
+              <form id="setPomodoro">
+                <div class="pomodoro-settings">
+                  <input type="number" id="minutes" placeholder="Minute focus (ex: 25)" min="1" required />
+                  <input type="number" id="breakMinutes" placeholder="Minute pauză (ex: 5)" min="1" required />
+                  <input type="number" id="cycles" placeholder="Număr cicluri (ex: 4)" min="1" required />
+                  <button type="submit" data-tooltip="Configurează și pornește Pomodoro">Setează Pomodoro</button>
+                </div>
+              </form>
+            
+              <div id="timePomodoro">00:00</div>
+            
+           
+              <div class="button-group">
+                <button id="startBtnPomodoro" type="button" data-tooltip="Începe Pomodoro">Start</button>
+                <button id="pauseBtnPomodoro" type="button" data-tooltip="Pauză temporară">Pauză</button>
+                <button id="stopBtnPomodoro" type="button" data-tooltip="Oprește și salvează Pomodoro">Stop</button>
+                <button id="resetBtnPomodoro" type="button" data-tooltip="Resetează Pomodoro">Resetează</button>
+              </div>
+            </section>
+
 
         <section class="card fade-in">
             <h2>Istoric sesiuni</h2>
