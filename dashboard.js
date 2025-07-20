@@ -969,7 +969,7 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
     }
   }
 
-  function startTimer() {
+  async function startTimer() {
     if (!running) {
       running = true;
       timer = setInterval(() => {
