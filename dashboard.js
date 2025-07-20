@@ -922,6 +922,13 @@ async function displayStreak() {
 
 let pomodoroInstance = null;
 
+function updatePomodoroDisplay(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  document.getElementById('timePomodoro').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+
 function startPomodoro(focusMinutes, breakMinutes, cycles) {
   if (pomodoroInstance) {
     alert("Pomodoro deja început sau inițializat, te rog să resetezi sau să continui sesiunea curentă");
