@@ -947,9 +947,9 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
   const stopBtn = document.getElementById('stopBtnPomodoro');
   const resetBtn = document.getElementById('resetBtnPomodoro');
 
-  function updateAndStoreSession() {
+ async function updateAndStoreSession() {
     if (totalFocusSeconds >= 60) {  
-      addDoc(collection(db, "studySessions"), {
+      await addDoc(collection(db, "studySessions"), {
         userId: currentUser.uid,
         createdAt: new Date(),
         seconds: totalFocusSeconds,
