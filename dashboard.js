@@ -1,3 +1,4 @@
+
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
@@ -916,3 +917,123 @@ async function displayStreak() {
 
   displayStr.innerHTML = `<img src="streak.png" class="streakImg" /> ${streak}`;
 }
+
+
+
+let pomodoroInstance = null;
+
+function startPomodoro(focusMinutes, breakMinutes, cycles) {
+  if (pomodoroInstance) {
+    alert("Pomodoro deja început sau inițializat, te rog să resetezi sau să continui sesiunea curentă");
+    return;
+  }
+
+  let remainingSeconds = focusMinutes * 60;
+  let running = false;
+  let timer = null;
+  let isBreak = false;
+  let currentCycle = 1;
+  let totalFocusSeconds = 0;
+
+  const startBtn = document.getElementById('startBtnPomodoro');
+  const pauseBtn = document.getElementById('pauseBtnPomodoro');
+  const stopBtn = document.getElementById('stopBtnPomodoro');
+  const resetBtn = document.getElementById('resetBtnPomodoro');
+
+  function updateAndStoreSession() {
+    if (totalFocusSeconds >= 60) {  
+      addDoc(collection(db, "studySessions"), {
+        userId: currentUser.uid,
+        createdAt: new Date(),
+        seconds: totalFocusSeconds,
+        title: "Sesiune Pomodoro",
+        description: `Pomodoro completat cu ${cycles} runde în  ${focusMinutes} minute`,
+        tag: "Pomodoro"
+      }).then(() => {
+        displaySessionsHistory();
+        updateProgressChart();
+        loadTagSuggestions();
+        loadTitleSuggestions();
+        drawTimeDistributionChart();
+        drawWeeklyChart();
+        displayXp();
+        if (totalFocusSeconds >= 1200) updateStudyStreak(); // 20 min = streak
+      });
+    }
+  }
+
+  function startTimer() {
+    if (!running) {
+      running = true;
+      timer = setInterval(() => {
+        if (remainingSeconds > 0) {
+          remainingSeconds--;
+          if (!isBreak) totalFocusSeconds++;
+          updatePomodoroDisplay(remainingSeconds);
+        } else {
+          if (!isBreak) {
+            isBreak = true;
+            remainingSeconds = breakMinutes * 60;
+            alert("E timul pentru o pauză! Relaxează-te puțin");
+          } else {
+            currentCycle++;
+            if (currentCycle > cycles) {
+              clearInterval(timer);
+              running = false;
+              alert("Pomodoro complet! E timul pentru o pauză lungă");
+              updateAndStoreSession();
+              pomodoroInstance = null;
+            } else {
+              isBreak = false;
+              remainingSeconds = focusMinutes * 60;
+              alert(`Runda ${currentCycle} începe. Timpul să te foocusezi!`);
+            }
+          }
+        }
+      }, 1000);
+    }
+  }
+
+  startBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    startTimer();
+  });
+
+  pauseBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    running = false;
+    clearInterval(timer);
+  });
+
+  stopBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    running = false;
+    clearInterval(timer);
+    updateAndStoreSession();
+    alert("Sesiune pomodoro oprită");
+    pomodoroInstance = null;
+  });
+
+  resetBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    running = false;
+    clearInterval(timer);
+    remainingSeconds = focusMinutes * 60;
+    isBreak = false;
+    currentCycle = 1;
+    totalFocusSeconds = 0;
+    updatePomodoroDisplay(remainingSeconds);
+    alert("Resetare pomodoro");
+  });
+
+  pomodoroInstance = { startTimer, pause: () => clearInterval(timer), reset: () => clearInterval(timer) };
+}
+
+document.getElementById('setPomodoro').addEventListener("submit", (e) => {
+  e.preventDefault();
+  const focusMinutes = parseInt(document.getElementById('minutes').value, 10);
+  const breakMinutes = parseInt(document.getElementById('breakMinutes').value, 10);
+  const cycles = parseInt(document.getElementById('cycles').value, 10);
+
+  startPomodoro(focusMinutes, breakMinutes, cycles);
+});
