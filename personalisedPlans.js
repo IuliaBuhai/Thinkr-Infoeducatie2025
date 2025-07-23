@@ -12,7 +12,7 @@ onAuthStateChanged(auth, async (user) => {
   let username = await getUserName();
 
   initPrefForm();
-
+  await displayPreferences();
 });
 
 async function getUserName(){
@@ -66,7 +66,15 @@ async function getLearnerType(){
 
   const data = snapshot.docs[0].data();
   const result = data.results;
-  return Math.max(Math.max(result["Auditiv"], result["Vizual"]), result["Tactil"])
+ if(result["Auditiv"]> result["Vizual"] && result["Auditiv"]>result["Tactil"]){
+      return "Auditiv";
+ }
+ if(result["Vizual"]> result["Auditiv"] && result["Vizual"]>result["Tactil"]){
+      return "Vizual";
+ }
+ if(result["Tactil"]> result["Auditiv"] && result["Tactil"]>result["Vizual"]){
+      return "Tactil";
+ }
 
 }
 async function initPrefForm() {
@@ -107,4 +115,21 @@ async function initPrefForm() {
   
     form.style.display = "none";
   });
+}
+
+
+async function displayPreferences(){
+  const preferences = document.getElementById("displayPreferences");
+  const userQuery = query(
+    collection(db,"preferences"),
+    where("userId","==", currentUser.uid)
+  )
+  const snapshot = await getDocs(userQuery);
+  const data = snapshot.docs[0].data();
+  const age = data.age;
+  const preferedTime = data.preferedTime;
+  const learnerType = data.learnerType;
+
+  preferences.innerHTML= `Vârsta : ${age} Timpul preferat pentru învățat : ${preferedTime} Tipul de studiat preferat/optim : ${learnerType}`;
+
 }
