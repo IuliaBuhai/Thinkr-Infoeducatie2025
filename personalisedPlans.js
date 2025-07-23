@@ -29,7 +29,7 @@ async function getUserName(){
 
   return snapshot.docs[0].data().username;
 }
-}
+
 
 async function averageStudySessions(){
   const sessionsQuery = query(
