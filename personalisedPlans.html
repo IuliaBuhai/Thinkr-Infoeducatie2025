@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Formular Preferințe</title>
+</head>
+<body>
+
+  <!-- Preferences Form (initially hidden) -->
+  <form id="prefForm" style="display: none;">
+    <h2>Setează-ți preferințele</h2>
+
+    <label for="age">Vârsta:</label>
+    <input type="number" id="age" name="age" required><br><br>
+
+    <label for="preferedTime">Timpul preferat pentru a învăța:</label>
+    <input type="text" id="preferedTime" name="preferedTime"  placeholder="Dimineața, seara, între orele 15-17 etc."><br><br>
+
+    <label for="tasks">Taskuri-le pe care trebuie să le îndeplinețti(în ordinea importanței):</label><br>
+    <textarea id="tasks" name="tasks" rows="4" cols="30" required></textarea><br><br>
+
+    <button type="submit" id="submitPrefForm">Salvează Preferințele</button>
+  </form>
+
+  <script type="module" src="personalisedPlans.js"></script>
+</body>
+</html>
