@@ -93,7 +93,7 @@ async function initPrefForm() {
     const avgStudy = await averageStudySessions();
     const preferedTime = document.getElementById("preferedTime").value.trim();
     const learnerType = await getLearnerType();
-    const tasks = document.getElementById("tasks").value.trim();
+   
 
     await addDoc(collection(db, "preferences"), {
       userId: currentUser.uid,
@@ -101,7 +101,7 @@ async function initPrefForm() {
       avgStudySession: avgStudy,
       preferedTime: preferedTime,
       learnerType: learnerType,
-      tasks: tasks,
+    
     });
 
   
