@@ -9,7 +9,7 @@ onAuthStateChanged(auth, async (user) => {
     return window.location.href = 'login.html';
   }
   currentUser = user;
-  username = await getUserName();
+  let username = await getUserName();
 
   initPrefForm();
 
