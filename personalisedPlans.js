@@ -22,7 +22,13 @@ async function getUserName(){
   )
   const snapshot = await getDocs(userQuery);
 
+   if (snapshot.empty) {
+   
+    return "Username-ul nu a putut fi gasit"; 
+  }
+
   return snapshot.docs[0].data().username;
+}
 }
 
 async function averageStudySessions(){
