@@ -19,6 +19,12 @@ async function getUserName() {
     where("userId", "==", currentUser.uid)
   );
   const snapshot = await getDocs(userQuery);
+  if (snapshot.empty) {
+    console.warn("User nu a putut fi gasit pentru uid:", currentUser.uid);
+    return "Utilizator"; 
+  }
+
+  return snapshot.docs[0].data().username
   return snapshot.docs[0].data().username;
 }
 
