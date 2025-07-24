@@ -7,11 +7,9 @@
 <body>
 
   <p id ="displayPreferences"></p>
-  <form id="prefForm" style="display: none;">
-    <input type="number" id="age" placeholder="Vârsta" required />
-    <input type="text" id="preferedTime" placeholder="Perioada preferată de studiu" required />
-    <textarea id="tasks" placeholder="Task-uri (separate prin virgulă)" required></textarea>
-    <button type="submit">Generează plan</button>
+  <form id="planForm">
+    <textarea id="planTasks" placeholder="Task-uri pentru planul săptămânal" required></textarea>
+    <button type="submit">Generează Plan</button>
   </form>
 
   <div id="studyPlanContainer"></div>
