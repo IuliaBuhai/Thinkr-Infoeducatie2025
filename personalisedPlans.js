@@ -9,7 +9,7 @@ onAuthStateChanged(auth, async (user) => {
     return window.location.href = 'login.html';
   }
   currentUser = user;
-  username = await getUserName();
+  let username = await getUserName();
   initPrefForm();
 });
 
@@ -25,7 +25,7 @@ async function getUserName() {
   }
 
   return snapshot.docs[0].data().username
-  return snapshot.docs[0].data().username;
+
 }
 
 async function averageStudySessions() {
@@ -56,7 +56,6 @@ async function getLearnerType() {
   const data = snapshot.docs[0].data();
   const result = data.results;
 
-  // Find the learner type with the highest score
   const maxScore = Math.max(result["Auditiv"], result["Vizual"], result["Tactil"]);
   return Object.keys(result).find(key => result[key] === maxScore);
 }
