@@ -13,6 +13,7 @@ onAuthStateChanged(auth, async (user) => {
   let username = await getUserName();
   await initPrefForm();     
   await initPlanForm();     
+  await loadExistingPlan();
 });
 
 async function getUserName() {
@@ -190,6 +191,22 @@ async function initPrefForm() {
     alert("Preferințele au fost salvate. Poți acum genera planuri.");
   });
 }
+
+ async function loadExistingPlan() {
+  const planQuery = query(
+    collection(db, "weekPlan"),
+    where("userId", "==", currentUser.uid)
+  );
+  const snapshot = await getDocs(planQuery);
+
+  if (!snapshot.empty) {
+    const existingData = snapshot.docs[0].data().plan;
+    renderStudyPlan(existingData);
+  }else {
+  document.getElementById("calendar").innerHTML = "<p>Nu ai un plan generat încă.</p>";
+  }
+}
+
 
 async function initPlanForm() {
   const form = document.getElementById("planForm");
