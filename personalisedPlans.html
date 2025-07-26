@@ -67,6 +67,20 @@
   </style>
 </head>
 <body>
+  <div id="calendar" class="calendar-container"></div>
+
+
+    <div id="taskModal" class="modal hidden">
+      <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <p id="modalDescription"></p>
+        <p><strong>Durată:</strong> <span id="modalDuration"></span> minute</p>
+        <p><strong>Web:</strong> <span id="modalWeb"></span></p>
+        <p><strong>Cărți:</strong> <span id="modalBooks"></span></p>
+      </div>
+    </div>
+
   <form id="prefForm" style="display: none;">
   <h3>Setează-ți preferințele</h3>
   <input type="number" id="age" placeholder="Vârsta" required />
