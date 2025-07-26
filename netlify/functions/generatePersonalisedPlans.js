@@ -30,11 +30,10 @@ export async function handler(event) {
 Creează un plan detaliat de studiu pentru această săptămână. Planul trebuie să respecte următoarele:
 
 - Fiecare zi va fi una din zilele săptămânii începând cu **${weekDaysOrdered[0]}**, apoi ${weekDaysOrdered.slice(1).join(", ")};
-- Pentru fiecare zi, include 1–3 task-uri;
-- Pentru fiecare task, include: titlu, descriere detaliată, durată (în minute), resurse web și cărți;
+- Pentru fiecare zi, include 2–5 task-uri;
+- Pentru fiecare task, include: titlu, descriere detaliată, durată (în minute sau ore daca sunt peste 60 de minute), resurse web și cărți;
 - Studentul are ${age} ani, stilul său de învățare optim este: "${learnerType}";
 - Are următoarele task-uri de finalizat (în ordinea priorității): ${tasks}, unele task-uri au detalii în paranteze, deci ai grijă să ți cont de ele ;
-- Sesiunea medie de studiu este de ${avgStudyTime} minute;
 - Organizează sarcinile eficient și echilibrat.
 
 Returnează DOAR JSON valid, în următorul format:
