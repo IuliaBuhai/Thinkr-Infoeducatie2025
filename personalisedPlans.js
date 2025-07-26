@@ -11,8 +11,8 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
   let username = await getUserName();
-  await initPrefForm();     // One-time preferences
-  await initPlanForm();     // Always-visible plan generation
+  await initPrefForm();     
+  await initPlanForm();     
 });
 
 async function getUserName() {
@@ -109,6 +109,53 @@ function renderStudyPlan(planData) {
 
     container.appendChild(dayDiv);
   });
+      
+        const calendar = document.getElementById("calendar");
+        calendar.innerHTML = "";
+      
+        planData.plan.forEach(dayPlan => {
+          const dayDiv = document.createElement("div");
+          dayDiv.classList.add("day-column");
+      
+          const dayHeader = document.createElement("h4");
+          dayHeader.textContent = dayPlan.day;
+          dayDiv.appendChild(dayHeader);
+      
+          dayPlan.tasks.forEach(task => {
+            const taskDiv = document.createElement("div");
+            taskDiv.classList.add("task-title");
+            taskDiv.textContent = task.title;
+      
+            
+      taskDiv.addEventListener("click", () => {
+        document.getElementById("modalTitle").textContent = task.title;
+        document.getElementById("modalDescription").textContent = task.description;
+        document.getElementById("modalDuration").textContent = task.duration;
+        document.getElementById("modalWeb").innerHTML = task.resources.web.map(link => `<a href="${link}" target="_blank">${link}</a>`).join(", ");
+        document.getElementById("modalBooks").textContent = task.resources.books.join(", ");
+        document.getElementById("taskModal").classList.remove("hidden");
+      });
+
+      dayDiv.appendChild(taskDiv);
+    });
+
+    calendar.appendChild(dayDiv);
+  });
+
+  
+  document.getElementById("closeModal").addEventListener("click", () => {
+    document.getElementById("taskModal").classList.add("hidden");
+  });
+
+
+  window.addEventListener("click", (e) => {
+    const modal = document.getElementById("taskModal");
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+    }
+  });
+}
+
 }
 
 async function initPrefForm() {
