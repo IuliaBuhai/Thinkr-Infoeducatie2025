@@ -290,6 +290,7 @@ function initTimerLogic() {
     await drawWeeklyChart();
     await displayXp();
     await updateStudyStreak();
+    await displayStreak();
     alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză");
   });
 
