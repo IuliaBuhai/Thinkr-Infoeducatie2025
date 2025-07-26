@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { addDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { addDoc, collection, query, where, getDocs,updateDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
 let currentUser;
 
@@ -59,7 +59,7 @@ async function getLearnerType() {
   const snapshot = await getDocs(resultQuery);
 
   if (snapshot.empty) {
-    return "Vizual"; // default fallback
+    return "Vizual"; 
   }
 
   const result = snapshot.docs[0].data().results;
@@ -118,7 +118,7 @@ async function initPrefForm() {
   );
   const snapshot = await getDocs(prefQuery);
 
-  if (!snapshot.empty) return; // preferences already exist
+  if (!snapshot.empty) return; 
 
   const form = document.getElementById("prefForm");
   form.style.display = "block";
@@ -156,7 +156,6 @@ async function initPlanForm() {
     const avgStudy = await averageStudySessions();
     const learnerType = await getLearnerType();
 
-    // Get saved age from preferences
     const prefQuery = query(
       collection(db, "preferences"),
       where("userId", "==", currentUser.uid)
@@ -186,6 +185,28 @@ async function initPlanForm() {
       console.error("Plan generation failed:", error);
     } else {
       const data = await response.json();
+
+      const planQuery = query(
+        collection(db, "weekPlan"),
+        where("userId", "==", currentUser.uid)
+      )
+
+      const snapshot = await getDocs(planQuery);
+
+      if (snapshot.empty) {
+        await addDoc(collection(db, "weekPlan"), {
+          userId: currentUser.uid,
+          plan: data,
+          createdAt: new Date(),
+        });
+      } else {
+        const docRef = snapshot.docs[0].ref;
+        await updateDoc(docRef, {
+          plan: data,
+          updatedAt: new Date(),
+        });
+      }
+
       renderStudyPlan(data);
     }
   });
