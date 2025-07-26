@@ -5,28 +5,27 @@
   <title>Formular Preferințe</title>
 </head>
 <body>
+  <form id="prefForm" style="display: none;">
+  <h3>Setează-ți preferințele</h3>
+  <input type="number" id="age" placeholder="Vârsta" required />
+  <input type="text" id="preferedTime" placeholder="Perioada preferată de studiu" required />
+  <textarea id="tasks" placeholder="Task-uri inițiale (virgule între ele)" required></textarea>
+  <button type="submit">Salvează Preferințe</button>
+</form>
+
+<form id="planForm">
+  <h3>Generează un plan personalizat</h3>
+  <textarea id="planTasks" placeholder="Scrie aici task-urile pentru această săptămână" required></textarea>
+  <button type="submit">Generează Plan</button>
+</form>
+
+<div id="studyPlanContainer"></div>
+
+
+
+  
 
   <p id ="displayPreferences"></p>
-  <form id="planForm">
-    <textarea id="planTasks" placeholder="Task-uri pentru planul săptămânal" required></textarea>
-    <button type="submit">Generează Plan</button>
-  </form>
-
-  <div id="studyPlanContainer"></div>
-  <form id="prefForm" style="display: none;">
-    <h2>Setează-ți preferințele</h2>
-
-    <label for="age">Vârsta:</label>
-    <input type="number" id="age" name="age" required><br><br>
-
-    <label for="preferedTime">Timpul preferat pentru a învăța:</label>
-    <input type="text" id="preferedTime" name="preferedTime"  placeholder="Dimineața, seara, între orele 15-17 etc."><br><br>
-
-    <label for="tasks">Taskuri-le pe care trebuie să le îndeplinețti(în ordinea importanței):</label><br>
-    <textarea id="tasks" name="tasks" rows="4" cols="30" required></textarea><br><br>
-
-    <button type="submit" id="submitPrefForm">Salvează Preferințele</button>
-  </form>
 
   <script type="module" src="personalisedPlans.js"></script>
 </body>
