@@ -68,7 +68,7 @@ onAuthStateChanged(auth, async (user) => {
     displayStreak();
   
 
-    // Set up logout
+    
     logoutBtn.addEventListener("click", async () => {
       try {
         await signOut(auth);
@@ -289,7 +289,7 @@ function initTimerLogic() {
     await drawTimeDistributionChart();
     await drawWeeklyChart();
     await displayXp();
-    if(seconds >= 1200) await updateStudyStreak();
+    await updateStudyStreak();
     alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză");
   });
 
