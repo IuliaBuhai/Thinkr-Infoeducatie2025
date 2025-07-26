@@ -33,7 +33,7 @@ Creează un plan detaliat de studiu pentru această săptămână. Planul trebui
 - Pentru fiecare zi, include 1–3 task-uri;
 - Pentru fiecare task, include: titlu, descriere detaliată, durată (în minute), resurse web și cărți;
 - Studentul are ${age} ani, stilul său de învățare optim este: "${learnerType}";
-- Are următoarele task-uri de finalizat (în ordinea priorității): ${tasks}, unele task-uri au detalii ]n paranteze, deci ai grij[ s[ 'i cont de ele ]];
+- Are următoarele task-uri de finalizat (în ordinea priorității): ${tasks}, unele task-uri au detalii în paranteze, deci ai grijă să ți cont de ele ;
 - Sesiunea medie de studiu este de ${avgStudyTime} minute;
 - Organizează sarcinile eficient și echilibrat.
 
@@ -61,7 +61,7 @@ Returnează DOAR JSON valid, în următorul format:
     `.trim();
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", 
+      model: "gpt-4", 
       messages: [{ role: "user", content: prompt }],
     });
 
