@@ -48,14 +48,14 @@
       font-size: 1rem;
     }
 
-    button {
+    .button {
       background: var(--accent-blue);
       color: white;
       cursor: pointer;
       font-weight: bold;
     }
 
-    button:hover {
+    .button:hover {
       background: var(--accent-purple);
     }
 
@@ -187,13 +187,13 @@
     <input type="number" id="age" placeholder="Vârsta" required />
     <input type="text" id="preferedTime" placeholder="Perioada preferată de studiu" required />
     <textarea id="tasks" placeholder="Task-uri inițiale (virgule între ele)" required></textarea>
-    <button type="submit">Salvează Preferințe</button>
+    <button type="submit" class="button">Salvează Preferințe</button>
   </form>
 
   <form id="planForm">
     <h3>Generează un plan personalizat</h3>
     <textarea id="planTasks" placeholder="Scrie task-urile pentru această săptămână..." required></textarea>
-    <button type="submit">Generează plan sau modifică-l pe cel vechi</button>
+    <button type="submit" class="button">Generează plan sau modifică-l pe cel vechi</button>
   </form>
 
   <div id="studyPlanContainer"></div>
