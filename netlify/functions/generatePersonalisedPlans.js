@@ -29,7 +29,7 @@ export async function handler(event) {
     let prompt = `
 Creează un plan detaliat de studiu pentru această săptămână. Planul trebuie să respecte următoarele:
 
-- Fiecare zi va fi una din zilele săptămânii începând cu **${weekDaysOrdered[0]}**, apoi ${weekDaysOrdered.slice(1).join(", ")};
+- Fiecare zi a planului va fi exact una din următoarele, în această ordine:${weekDaysOrdered.map((d, i) => `${i + 1}. ${d}`).join("\n")} ,Asociază corect task-urile cu ziua potrivită și nu schimba ordinea.;
 - Pentru fiecare zi, include 2–5 task-uri;
 - Pentru fiecare task, include: titlu, descriere detaliată, durată (în minute sau ore daca sunt peste 60 de minute), resurse web și cărți;
 - Studentul are ${age} ani, stilul său de învățare optim este: "${learnerType}";
