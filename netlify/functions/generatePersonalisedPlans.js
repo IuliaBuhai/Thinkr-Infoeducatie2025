@@ -40,7 +40,7 @@ export async function handler(event) {
 Creează un plan detaliat de studiu pentru această săptămână. Planul trebuie să respecte următoarele:
 
 - Fiecare zi va fi etichetată astfel: ${weekDaysOrdered.join(", ")}.Folosește exact aceste etichete în planul returnat pentru a ajuta la organizarea după dată. ,Asociază corect task-urile cu ziua potrivită și nu schimba ordinea.;
-- Pentru fiecare zi, include 2–5 task-uri;
+- Pentru fiecare zi, include cate task-uri sunt nevoie;
 - Pentru fiecare task, include: titlu, descriere detaliata, durată (în minute ), resurse web și cărți, sau "nu e nevoie" daca nu e cazul ;
 - Studentul are ${age} ani,
 - Are următoarele task-uri de finalizat (în ordinea priorității): ${tasks}, unele task-uri au detalii în paranteze, deci ai grijă să ți cont de ele ;
