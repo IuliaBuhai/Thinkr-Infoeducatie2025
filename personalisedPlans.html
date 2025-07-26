@@ -152,21 +152,94 @@
     .task a {
       color: var(--accent-purple);
     }
+
+   
+       header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        background-color: var(--glass-effect);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: background-color 0.3s ease;
+        }
+
+    .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    }
+
+    .logo-container .logo {
+    height: 40px;
+    width: auto;
+    }
+
+        .greeting {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--accent-blue);
+        user-select: none;
+        }
+
+        .nav-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .nav-buttons a button,
+        .nav-buttons button {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+
+        .nav-buttons a button,
+        .nav-buttons button {
+        background: var(--accent-blue);
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        }
+
+        .nav-buttons a button:hover,
+        .nav-buttons button:hover {
+        background: var(--accent-purple);
+        }
+
+
   </style>
 </head>
 <body>
-  <header>
-    <div style="display: flex; align-items: center; gap: 1rem;">
-        <div class="logo-container">
-            <img src="logo1.png" alt="Thinkr Logo" class="logo">
-        </div>
-        <div id="greeting">PlanneR</div>
+  <header class="header">
+  <div class="header-left">
+    <div class="logo-container">
+      <img src="logo1.png" alt="Thinkr Logo" class="logo" />
     </div>
-    <a href="dashboard.html"><button>Dashboard</button></a>
-    <a href="index.html"><button>Acasa</button></a>
-    <a href="articole.html"><button>Articole</button></a>
-    <button id="logoutBtn">Logout</button>
+    <div id="greeting" class="greeting">PlanneR</div>
+  </div>
+  <nav class="nav-buttons">
+    <a href="dashboard.html"><button class="button">Dashboard</button></a>
+    <a href="index.html"><button class="button">Acasa</button></a>
+    <a href="articole.html"><button class="button">Articole</button></a>
+  
+  </nav>
 </header>
+
 
   <h2>Calendarul Tău Săptămânal</h2>
   <div id="calendar" class="calendar-container"></div>
