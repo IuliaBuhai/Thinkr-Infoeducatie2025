@@ -156,8 +156,6 @@ function renderStudyPlan(planData) {
   });
 }
 
-}
-
 async function initPrefForm() {
   const prefQuery = query(
     collection(db, "preferences"),
