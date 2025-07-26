@@ -37,43 +37,43 @@ export async function handler(event) {
 
 
     let prompt = `
-Creează un plan detaliat de studiu pentru această săptămână, respectând următoarele reguli:
-
-- Fiecare zi va avea eticheta exactă în formatul: ${weekDaysOrdered.join(", ")}, pe care trebuie să o folosești în răspuns.
-- Pentru fiecare zi, include între 2 și 5 task-uri, organizate echilibrat în timp.
-- Task-urile pot fi recurente (zilnic) sau punctuale (în zile specifice), respectă cerințele din lista de task-uri.
-- Pentru fiecare task, oferă:
-  * titlu clar,
-  * descriere detaliată a activității,
-  * durată exprimată în minute (dacă este mai mare de 60 minute, folosește formatul "X ore Y minute", de ex: "2 ore 30 minute"),
-  * resurse web (2-3 linkuri relevante) și cărți recomandate (titlu și autor) – dacă nu sunt resurse, scrie "nu este cazul".
-- Studentul are ${age} ani și stilul său de învățare optim este: "${learnerType}".
-- Următoarele task-uri trebuie incluse, în ordinea priorității, respectând detaliile din paranteze: ${tasks}.
-- Organizează sarcinile astfel încât să nu fie prea încărcate în aceeași zi și să existe varietate.
-- Dacă un task este zilnic (ex: pregătire bac română 2 ore pe zi), distribuie-l proporțional și oferă varietate în activități și resurse.
-- Fii creativ și oferă sugestii utile în descriere și resurse.
-- Returnează DOAR un JSON valid în formatul următor:
-
-{
-  "plan": [
-    {
-      "day": "Luni",
-      "tasks": [
+        Creează un plan detaliat de studiu pentru această săptămână, respectând următoarele reguli:
+        
+        - Fiecare zi va avea eticheta exactă în formatul: ${weekDaysOrdered.join(", ")}, pe care trebuie să o folosești în răspuns.
+        - Pentru fiecare zi, include între 2 și 5 task-uri, organizate echilibrat în timp.
+        - Task-urile pot fi recurente (zilnic) sau punctuale (în zile specifice), respectă cerințele din lista de task-uri.
+        - Pentru fiecare task, oferă:
+          * titlu clar,
+          * descriere detaliată a activității,
+          * durată exprimată în minute (dacă este mai mare de 60 minute, folosește formatul "X ore Y minute", de ex: "2 ore 30 minute"),
+          * resurse web (2-3 linkuri relevante) și cărți recomandate (titlu și autor) – dacă nu sunt resurse, scrie "nu este cazul".
+        - Studentul are ${age} ani și stilul său de învățare optim este: "${learnerType}".
+        - Următoarele task-uri trebuie incluse, în ordinea priorității, respectând detaliile din paranteze: ${tasks}.
+        - Organizează sarcinile astfel încât să nu fie prea încărcate în aceeași zi și să existe varietate.
+        - Dacă un task este zilnic (ex: pregătire bac română 2 ore pe zi), asigură-te că îl adaugi în fiecare zi.
+        - Fii creativ și oferă sugestii utile în descriere și resurse.
+        - Returnează DOAR un JSON valid în formatul următor:
+        
         {
-          "title": "Titlu task",
-          "description": "Descriere detaliată a activității...",
-          "duration": "X ore Y minute",
-          "resources": {
-            "web": ["https://exemplu1.com", "https://exemplu2.com"],
-            "books": ["Titlu carte - Autor", "Altă carte - Autor"]
-          }
-        },
-        ...
-      ]
-    },
-    ...
-  ]
-}
+          "plan": [
+            {
+              "day": "Luni",
+              "tasks": [
+                {
+                  "title": "Titlu task",
+                  "description": "Descriere detaliată a activității...",
+                  "duration": "X ore Y minute",
+                  "resources": {
+                    "web": ["https://exemplu1.com", "https://exemplu2.com"],
+                    "books": ["Titlu carte - Autor", "Altă carte - Autor"]
+                  }
+                },
+                ...
+              ]
+            },
+            ...
+          ]
+        }
 
     `.trim();
 
