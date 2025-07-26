@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { Anthropic } from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -69,18 +69,13 @@ Creează un plan detaliat de studiu pentru această săptămână, respectând u
 }
 `;
 
-    const completion = await anthropic.messages.create({
-      model: "claude-3-sonnet-20240229",
-      max_tokens: 4000,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    const completion = await anthropic.chat.completions.create({
+      model: "claude-3",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens_to_sample: 4000,
     });
 
-    let raw = completion.content[0].text.trim();
+    let raw = completion.choices[0].message.content;
 
     if (raw.startsWith("```json")) {
       raw = raw.replace(/```json|```/g, "").trim();
