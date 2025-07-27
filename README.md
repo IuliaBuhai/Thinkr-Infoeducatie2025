@@ -1,4 +1,4 @@
-<img width="1916" height="911" alt="Screenshot 2025-07-16 121123" src="https://github.com/user-attachments/assets/af5ea552-2668-4cb6-8a71-22ff37d9734d" /># 🧠 Thinkr – Platformă inteligentă de dezvoltare personală
+# 🧠 Thinkr – Platformă inteligentă de dezvoltare personală
 
 Thinkr este o aplicație web completă, centrată pe utilizator, care își propune să sprijine dezvoltarea personală prin planificare ghidată, urmărirea progresului și acces la conținut educațional de calitate. Creată cu gândul la tineri, Thinkr combină simplitatea cu inteligența tehnologică, oferind o alternativă eficientă la metodele tradiționale de gestionare a obiectivelor și timpului.
 
@@ -115,7 +115,7 @@ Thinkr/
 
 ## 🖼️ Capturi de ecran
 
-<img width="1914" height="910" alt="Screenshot<img width="1907" height="913" alt="Screenshot 2025-07-16 121056" src="https://github.com/user-attachments/assets/1627963c-df50-4e32-9670-835ddb75e171" />
+<img width="1907" height="913" alt="Screenshot 2025-07-16 121056" src="https://github.com/user-attachments/assets/1627963c-df50-4e32-9670-835ddb75e171" />
 <img width="1914" height="910" alt="Screenshot 2025-07-16 121043" src="https://github.com/user-attachments/assets/341da728-a531-47c5-be8d-9f51f2463fdd" />
 <img width="1916" height="911" alt="Screenshot 2025-07-16 121123" src="https://github.com/user-attachments/assets/61ad9ad8-1229-4643-9b1b-081de7f6a548" />
 <img width="1919" height="911" alt="Screenshot 2025-07-26 155108" src="https://github.com/user-attachments/assets/5c92146d-5197-490f-9610-953464b06140" />
