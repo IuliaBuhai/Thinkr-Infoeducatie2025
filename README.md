@@ -1,4 +1,5 @@
 <img width="1024" height="1024" alt="logo" src="https://github.com/user-attachments/assets/ad141bb9-041d-4393-b9f6-3e1fc397ce04" />
+
 ## 🧠 Thinkr – Platformă inteligentă de dezvoltare personală
 
 Thinkr este o aplicație web completă, centrată pe utilizator, care își propune să sprijine dezvoltarea personală prin planificare ghidată, urmărirea progresului și acces la conținut educațional de calitate. Creată cu gândul la tineri, Thinkr combină simplitatea cu inteligența tehnologică, oferind o alternativă eficientă la metodele tradiționale de gestionare a obiectivelor și timpului.
