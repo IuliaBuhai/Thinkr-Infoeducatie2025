@@ -164,7 +164,8 @@ async function displayPlansHistory() {
   const plans = query(
     collection(db, "studyPlans"),
     where("userId", "==", currentUser.uid),
-    orderBy("createdAt", "desc")
+    orderBy("createdAt", "desc"),
+    limit(15)
   );
 
   const snapshot = await getDocs(plans);
@@ -202,7 +203,8 @@ async function displaySessionsHistory() {
   const sessions = query(
     collection(db, "studySessions"),
     where("userId", "==", currentUser.uid),
-    orderBy("createdAt", "desc")
+    orderBy("createdAt", "desc"),
+    limit(15)
   );
 
   const snapshot = await getDocs(sessions);
