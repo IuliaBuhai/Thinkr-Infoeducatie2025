@@ -656,6 +656,10 @@
             color:var(--danger);
         }
 
+        .badge{
+            opacity: 0.2;
+        }
+
         .pomodoro-settings {
           display: flex;
           gap: 0.5rem;
