@@ -365,7 +365,7 @@
                 </div>
                 
                 <label for="clasa">Clasa</label>
-                <input type="text" id="descriere"  required />
+                <input type="text" id="descriere" required />
                 
             
 
@@ -715,6 +715,7 @@
             const form = document.getElementById("generateTest");
             
             form.addEventListener("submit", async (e) => {
+                e.preventDefault();
                 const grade= document.getElementById().value;
                 const subject = document.getElementById().value;
                 const testTitle = document.getElementById().value;
