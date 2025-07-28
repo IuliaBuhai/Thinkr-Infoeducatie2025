@@ -67,6 +67,7 @@ onAuthStateChanged(auth, async (user) => {
     displayXp();
     displayStreak();
     await getBadges();
+    await displayPlanTags();
   
 
     
