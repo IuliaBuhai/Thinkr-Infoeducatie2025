@@ -666,8 +666,8 @@
               const snapshot = await getDocs(formQuery);
               const data = snapshot.docs[0].data();
               const displayResults = document.getElementById("displayType");
-              const max = Math.max(...Object.values(results));
-              const dominant = Object.keys(results).find((key) => results[key] === max);
+              const max = Math.max(...Object.values(data.results));
+              const dominant = Object.keys(data.results).find((key) => data.results[key] === max);
               displayResults.innerHTML = `
               <p>Stilul tău dominant de învățare este: <span class="result-highlight">${dominant}</span></p>
               <div class="scores">
