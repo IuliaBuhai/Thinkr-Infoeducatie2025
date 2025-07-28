@@ -658,6 +658,12 @@
             }
           });
             }else{
+              const formQuery = query(
+                collection(db, "testResults"),
+                where("userId", "==", currentUser.uid)
+              );
+
+              const snapshot = await getDocs(formQuery);
               const data = snapshot.docs[0].data();
               const displayResults = document.getElementById("displayType");
 
