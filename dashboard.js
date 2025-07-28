@@ -1,3 +1,4 @@
+
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
@@ -1064,4 +1065,48 @@ async function getBadges() {
     if (xp60 && xp >= 60) xp60.style.opacity = 1;
     if (xp100 && xp >= 100) xp100.style.opacity = 1;
     if (xp200 && xp >= 200) xp200.style.opacity = 1;
+}
+
+
+async function getGeneratedPlanTags() {
+  const plansQuery = query(
+    collection(db, "weekPlan"),
+    where("userId", "==", currentUser.uid)
+  );
+  const snapshot = await getDocs(plansQuery);
+
+  if (snapshot.empty) return [];
+
+  const data = snapshot.docs[0].data();
+  const plan = data.plan || {};
+  const tags = [];
+
+  Object.values(plan).forEach(day => {
+    const tasks = day.tasks || [];
+
+    tasks.forEach(task => {
+      if (task.title) {
+        tags.push(task.title);
+      }
+    });
+  });
+
+  return [...new Set(tags)];
+
+}
+
+
+async function displayPlanTags(){
+   const tagSet = await getGeneratedPlanTags();
+
+
+  const tagSuggestions = document.getElementById("tagSuggestions");
+  
+
+  tagSet.forEach(tag => {
+    const option = document.createElement("option");
+    option.value = tag;
+    tagSuggestions.appendChild(option);
+  });
+
 }
