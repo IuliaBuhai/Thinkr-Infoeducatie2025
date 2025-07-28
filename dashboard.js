@@ -1069,49 +1069,6 @@ async function getBadges() {
 }
 
 
-async function getGeneratedPlanTags() {
-  const plansQuery = query(
-    collection(db, "weekPlan"),
-    where("userId", "==", currentUser.uid)
-  );
-  const snapshot = await getDocs(plansQuery);
-
-  if (snapshot.empty) return [];
-
-  const data = snapshot.docs[0].data();
-  const plan = data.plan || {};
-  const tags = [];
-
-  Object.values(plan).forEach(plan => {
-    const days = plan.day || [];
-
-    tasks.forEach(days => {
-      if (task.title) {
-        tags.push(task.title);
-      }
-    });
-  });
-
-  return [...new Set(tags)];
-
-}
-
-
-async function displayPlanTags(){
-   const tagSet = await getGeneratedPlanTags();
-
-
-  const tagSuggestions = document.getElementById("tagSuggestions");
-  
-
-  tagSet.forEach(tag => {
-    const option = document.createElement("option");
-    option.value = tag;
-    tagSuggestions.appendChild(option);
-  });
-
-}
-
 async function addSession() {
   const sessionForm = document.getElementById("addSession");
 
