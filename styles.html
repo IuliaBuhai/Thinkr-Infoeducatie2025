@@ -658,7 +658,8 @@
             }
           });
             }else{
-              const formQuery = query(
+            document.getElementById("learningStyleForm").display="none";
+            const formQuery = query(
                 collection(db, "testResults"),
                 where("userId", "==", currentUser.uid)
               );
