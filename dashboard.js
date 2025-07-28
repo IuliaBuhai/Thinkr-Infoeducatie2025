@@ -1082,10 +1082,10 @@ async function getGeneratedPlanTags() {
   const plan = data.plan || {};
   const tags = [];
 
-  Object.values(plan).forEach(day => {
-    const tasks = day.tasks || [];
+  Object.values(plan).forEach(plan => {
+    const days = plan.day || [];
 
-    tasks.forEach(task => {
+    tasks.forEach(days => {
       if (task.title) {
         tags.push(task.title);
       }
