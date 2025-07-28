@@ -1,4 +1,3 @@
-
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
@@ -1110,4 +1109,47 @@ async function displayPlanTags(){
     tagSuggestions.appendChild(option);
   });
 
+}
+
+async function addSession() {
+  const sessionForm = document.getElementById("addSession");
+
+  sessionForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); 
+
+    const materie = document.getElementById("materie").value.trim();
+    const titlu = document.getElementById("titlu").value.trim();
+    const seconds = parseInt(document.getElementById("durata").value) * 60;
+    const description = document.getElementById("descriere").value.trim();
+
+    try {
+      await addDoc(collection(db, "studySessions"), {
+        createdAt: new Date(),
+        description: description,
+        seconds: seconds,
+        tag: materie,
+        title: titlu,
+        userId: currentUser.uid
+      });
+
+      
+      sessionForm.reset();
+
+    displaySessionsHistory();
+    updateProgressChart();
+    await loadTagSuggestions();
+    await loadTitleSuggestions();
+    await drawTimeDistributionChart();
+    await drawWeeklyChart();
+    await displayXp();
+    await updateStudyStreak();
+    await displayStreak();
+    await getBadges();
+
+      alert("Sessiune de studiu adaugată cu succes!");
+    } catch (error) {
+      console.error("Eroare:", error);
+      alert("Nu am reușit să adăugăm sesiunea, încearcă din nou");
+    }
+  });
 }
