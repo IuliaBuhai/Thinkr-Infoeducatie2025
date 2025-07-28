@@ -1069,9 +1069,9 @@ async function getBadges() {
 
 
 async function addSession() {
-  const sessionForm = document.getElementById("addSession");
+  const sessionFormAdd = document.getElementById("addSession");
 
-  sessionForm.addEventListener("submit", async (e) => {
+  sessionFormAdd.addEventListener("submit", async (e) => {
     e.preventDefault(); 
 
     const materie = document.getElementById("materie").value.trim();
