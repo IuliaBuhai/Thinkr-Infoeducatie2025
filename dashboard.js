@@ -1090,7 +1090,7 @@ async function addSession() {
       });
 
       
-      sessionForm.reset();
+      sessionFormAdd.reset();
 
     displaySessionsHistory();
     updateProgressChart();
