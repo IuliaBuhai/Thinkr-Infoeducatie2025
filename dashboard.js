@@ -1058,10 +1058,10 @@ async function getBadges() {
     const xp100 = document.getElementById("xp100");
     const xp200 = document.getElementById("xp200");
 
-    if (xp3 && xp >= 3) xp3.style.display = "block";
-    if (xp10 && xp >= 10) xp10.style.display = "block";
-    if (xp30 && xp >= 30) xp30.style.display = "block";
-    if (xp60 && xp >= 60) xp60.style.display = "block";
-    if (xp100 && xp >= 100) xp100.style.display = "block";
-    if (xp200 && xp >= 200) xp200.style.display = "block";
+    if (xp3 && xp >= 3) xp3.style.opacity = 1;
+    if (xp10 && xp >= 10) xp10.style.opacity = 1;
+    if (xp30 && xp >= 30) xp30.style.opacity = 1;
+    if (xp60 && xp >= 60) xp60.style.opacity = 1;
+    if (xp100 && xp >= 100) xp100.style.opacity = 1;
+    if (xp200 && xp >= 200) xp200.style.opacity = 1;
 }
