@@ -1,4 +1,3 @@
-
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
@@ -66,6 +65,7 @@ onAuthStateChanged(auth, async (user) => {
     await renderHeatmap();
     displayXp();
     displayStreak();
+    await getBadges();
   
 
     
@@ -291,6 +291,7 @@ function initTimerLogic() {
     await displayXp();
     await updateStudyStreak();
     await displayStreak();
+    await getBadges();
     alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză");
   });
 
@@ -1045,3 +1046,22 @@ document.getElementById('setPomodoro').addEventListener("submit", (e) => {
 
   startPomodoro(focusMinutes, breakMinutes, cycles);
 });
+
+
+async function getBadges() {
+    const xp = await getXp(); 
+
+    const xp3 = document.getElementById("xp3");
+    const xp10 = document.getElementById("xp10");
+    const xp30 = document.getElementById("xp30");
+    const xp60 = document.getElementById("xp60");
+    const xp100 = document.getElementById("xp100");
+    const xp200 = document.getElementById("xp200");
+
+    if (xp3 && xp >= 3) xp3.style.display = "block";
+    if (xp10 && xp >= 10) xp10.style.display = "block";
+    if (xp30 && xp >= 30) xp30.style.display = "block";
+    if (xp60 && xp >= 60) xp60.style.display = "block";
+    if (xp100 && xp >= 100) xp100.style.display = "block";
+    if (xp200 && xp >= 200) xp200.style.display = "block";
+}
