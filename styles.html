@@ -372,31 +372,6 @@
 
 
 
-    <section class="card fade-in">
-            <h2>Generare test </h2>
-            <p class="section-description">Generează un test și vezi unde mai ai de învățat</p>
-            
-            <form id="generateTest">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-                    <div>
-                        <label for="materie">Materia</label>
-                        <input type="text" id="materie" placeholder="Ex: Chimie" required />
-                    </div>
-                    <div>
-                        <label for="titlu">Titlu lecție / test (din ce dai test/ pentru ce te pregătești)</label>
-                        <input type="text" id="titlu" placeholder="Ex: Acizi și baze" required />
-                    </div>
-                </div>
-                
-                <label for="clasa">Clasa</label>
-                <input type="text" id="clasa" required />
-                
-            
-
-                <button type="submit" style="margin-top: 1.5rem;">Generează testul </button>
-            </form>
-  </div>
-
   <script type="module">
     import { auth, db } from './firebase.js';
     import {onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js';
