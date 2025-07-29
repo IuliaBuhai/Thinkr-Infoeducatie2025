@@ -678,7 +678,7 @@
       
         takeTestDiv.style.display = "block";
       
-        form.addEventListener("submit", (e) => {
+        form.addEventListener("submit", async (e) => {
           e.preventDefault();
           let correct = 0;
           const totalQuestions = questions.length;
@@ -738,10 +738,18 @@
               });
             }
           });
-      
-          // Calculate score
+
           const percentage = Math.round((correct / totalQuestions) * 100);
           let feedback = "";
+      
+          await addDoc(collection(db, "results"),{
+            userId: currentUser.uid,
+            result: percentage,
+            testTitle: title
+          })
+          
+
+          
           
           if (percentage >= 90) {
             feedback = "Excelent! Ai o înțelegere foarte bună a acestui subiect.";
