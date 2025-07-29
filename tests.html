@@ -964,7 +964,7 @@ onAuthStateChanged(auth, async (user) => {
       if (!res.ok) throw new Error(result.error || "Eroare la generare lectie");
 
       await addDoc(collection(db, "lectures"), {
-        lesson: result,
+        lesson: result.content,
         userId: currentUser.uid,
         createdAt: new Date(),
         title: data.title
@@ -1003,7 +1003,7 @@ async function displayFullLesson(title) {
   const displayLessons = document.getElementById("lecturesDisplay");
 
   const div = document.createElement("div");
-  div.innerHTML = data;
+  div.innerHTML = data.content;
   displayLessons.appendChild(div);
 }
 
