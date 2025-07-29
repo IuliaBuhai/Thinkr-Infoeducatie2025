@@ -1,3 +1,5 @@
+import OpenAI from "openai";
+
 export async function handler(event) {
   if (event.httpMethod !== "POST") {
     return {
@@ -11,7 +13,7 @@ export async function handler(event) {
   });
 
   try {
-    const { grade, subject, testTitle } = JSON.parse(event.body);
+    const { grade, subject, testTitle} = JSON.parse(event.body);
     
     let prompt = `
           Creează un test pentru disciplina "${subject}", destinat unui elev de clasa a ${grade}-a, pe tema "${testTitle}".
@@ -20,8 +22,8 @@ export async function handler(event) {
           - Testul trebuie să conțină exact 10 întrebări.
           - Întrebările vor fi de dificultate medie și ridicată.
           - Fiecare întrebare va avea:
-            - 4 variante de răspuns (a, b, c, d)
-            - Un singur răspuns corect (indicați indexul corect 0-3)
+            - Minim două variante de răspuns (alege răspunsuri multiple dacă este cazul).
+            - Un câmp "correctAnswers" cu indicarea răspunsurilor corecte.
             - O explicație clară a rezolvării.
 
           Format de ieșire (JSON):
@@ -32,7 +34,7 @@ export async function handler(event) {
               {
                 "question": "Întrebarea 1...",
                 "options": ["Răspuns A", "Răspuns B", "Răspuns C", "Răspuns D"],
-                "correctIndex": 0,
+                "correctAnswers": [0, 2],
                 "explanation": "Explicația detaliată..."
               },
               ...
@@ -53,20 +55,9 @@ export async function handler(event) {
 
     const plan = JSON.parse(raw);
 
-    
-    const transformedPlan = {
-      ...plan,
-      questions: plan.questions.map(q => ({
-        ...q,
-        
-        correctIndex: q.correctIndex !== undefined ? q.correctIndex : 
-                     (q.correctAnswers && q.correctAnswers.length ? q.correctAnswers[0] : 0)
-      }))
-    };
-
     return {
       statusCode: 200,
-      body: JSON.stringify(transformedPlan),
+      body: JSON.stringify(plan),
     };
 
   } catch (err) {
