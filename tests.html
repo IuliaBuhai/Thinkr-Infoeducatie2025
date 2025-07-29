@@ -560,6 +560,11 @@
     <section class="card fade-in">
       <div id="resultDisplay" style="display:none;"></div>
     </section>
+
+    <section class="card fade-in">
+      <h1>Lecțiile tale</h1>
+      <div id="lecturesDisplay"></div>
+    </section>
   </div>
 
   <script type="module">
@@ -568,12 +573,6 @@
     import {addDoc,collection, query, getDocs, where } from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js';
 
     let currentUser = null;
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return window.location.href = 'login.html';
-      currentUser = user;
-      initTestForm();
-    });
 
     function initTestForm(){
       const form = document.getElementById("generateTest");
@@ -950,6 +949,38 @@ onAuthStateChanged(auth, async (user) => {
   
   await displayTestResultHistory();
 });
+
+
+    async function getLecture(data){
+
+       try {
+      const res = await fetch("/.netlify/functions/generatePlan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Eroare la generare lectie");
+
+      await addDoc(collection(db, "lectures"), {
+        lesson: result,
+        userId: currentUser.uid,
+        createdAt: new Date(),
+        title: data.title
+        
+      });
+
+      const displayLessons = document.getElementById("lecturesDisplay");
+      const h1 = document.createElement("h1");
+      h1.textContent = data.title;
+      displayLessons.appendChild(h1);
+      
+
+    }catch(err){
+    console.log(err.message);
+  }
+}
 
   </script>
 </body>
