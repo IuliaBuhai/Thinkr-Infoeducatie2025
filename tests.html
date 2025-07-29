@@ -612,123 +612,131 @@
     }
 
     async function takeTest(title, questions) {
-      const takeTestDiv = document.querySelector(".takeTest");
-      takeTestDiv.innerHTML = `
-        <div class="test-header">
-          <h2 class="test-title">${title}</h2>
-          <button class="close-test" onclick="document.querySelector('.takeTest').style.display='none'">×</button>
-        </div>
-        <form id="testForm"></form>
-        <div class="test-results" id="testResults"></div>
-      `;
+  const takeTestDiv = document.querySelector(".takeTest");
+  takeTestDiv.innerHTML = `
+    <div class="test-header">
+      <h2 class="test-title">${title}</h2>
+      <button class="close-test" onclick="document.querySelector('.takeTest').style.display='none'">×</button>
+    </div>
+    <form id="testForm"></form>
+    <div class="test-results" id="testResults"></div>
+  `;
 
-      const form = document.getElementById("testForm");
+  const form = document.getElementById("testForm");
+  
+  questions.forEach((question, index) => {
+    const qBlock = document.createElement("div");
+    qBlock.className = "question-block";
+    qBlock.dataset.index = index;
+
+    const qText = document.createElement("p");
+    qText.className = "test-question";
+    qText.dataset.number = `Q${index + 1}.`;
+    qText.textContent = question.question;
+    qBlock.appendChild(qText);
+
+    const answerGroup = document.createElement("div");
+    answerGroup.className = "test-options";
+
+    question.options.forEach((opt, optIndex) => {
+      const label = document.createElement("label");
+      label.className = "test-label";
       
-      questions.forEach((question, index) => {
-        const qBlock = document.createElement("div");
-        qBlock.className = "question-block";
-        qBlock.dataset.index = index;
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = `question-${index}`;
+      input.value = optIndex;
+      input.id = `q${index}-opt${optIndex}`;
+      
+      const span = document.createElement("span");
+      span.textContent = opt;
+      
+      label.appendChild(input);
+      label.appendChild(span);
+      answerGroup.appendChild(label);
+    });
 
-        const qText = document.createElement("p");
-        qText.className = "test-question";
-        qText.dataset.number = `Q${index + 1}.`;
-        qText.textContent = question.question;
-        qBlock.appendChild(qText);
+    const explanation = document.createElement("div");
+    explanation.className = "test-explanation";
+    explanation.innerHTML = `<strong>Explicație:</strong> ${question.explanation}`;
+    
+    qBlock.appendChild(answerGroup);
+    qBlock.appendChild(explanation);
+    form.appendChild(qBlock);
+  });
 
-        const answerGroup = document.createElement("div");
-        answerGroup.className = "test-options";
+  const submitBtn = document.createElement("button");
+  submitBtn.type = "submit";
+  submitBtn.className = "test-submit-btn";
+  submitBtn.textContent = "Trimite testul";
+  form.appendChild(submitBtn);
 
-        question.options.forEach((opt, optIndex) => {
-          const label = document.createElement("label");
-          label.className = "test-label";
-          
-          const input = document.createElement("input");
-          input.type = "radio";
-          input.name = `question-${index}`;
-          input.value = optIndex;
-          input.id = `q${index}-opt${optIndex}`;
-          
-          const span = document.createElement("span");
-          span.textContent = opt;
-          
-          label.appendChild(input);
-          label.appendChild(span);
-          answerGroup.appendChild(label);
-        });
+  takeTestDiv.style.display = "block";
 
-        const explanation = document.createElement("div");
-        explanation.className = "test-explanation";
-        explanation.innerHTML = `<strong>Explicație:</strong> ${question.explanation}`;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let correct = 0;
+    const totalQuestions = questions.length;
+
+    questions.forEach((question, index) => {
+      const qBlock = form.querySelector(`.question-block[data-index="${index}"]`);
+      if (!qBlock) return; // Skip if question block not found
+      
+      const selected = form.querySelector(`input[name="question-${index}"]:checked`);
+      const explanation = qBlock.querySelector(".test-explanation");
+      const labels = qBlock.querySelectorAll(".test-label");
+
+     
+      if (explanation) explanation.style.display = "block";
+
+     
+      if (selected) {
+        const answerIndex = parseInt(selected.value, 10);
+        const selectedLabel = selected.closest(".test-label");
+        const correctLabel = labels[question.correctIndex];
         
-        qBlock.appendChild(answerGroup);
-        qBlock.appendChild(explanation);
-        form.appendChild(qBlock);
-      });
-
-      const submitBtn = document.createElement("button");
-      submitBtn.type = "submit";
-      submitBtn.className = "test-submit-btn";
-      submitBtn.textContent = "Trimite testul";
-      form.appendChild(submitBtn);
-
-      takeTestDiv.style.display = "block";
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        let correct = 0;
-        const totalQuestions = questions.length;
-
-        questions.forEach((question, index) => {
-          const selected = form.querySelector(`input[name="question-${index}"]:checked`);
-          const qBlock = form.querySelector(`.question-block[data-index="${index}"]`);
-          const explanation = qBlock.querySelector(".test-explanation");
-          const labels = qBlock.querySelectorAll(".test-label");
-
-          explanation.style.display = "block";
-
-          if (selected) {
-            const answerIndex = parseInt(selected.value, 10);
-            if (answerIndex === question.correctIndex) {
-              labels[answerIndex].classList.add("correct-answer");
-              correct++;
-            } else {
-              labels[answerIndex].classList.add("incorrect-answer");
-              labels[question.correctIndex].classList.add("correct-answer");
-            }
-          } else {
-            labels[question.correctIndex].classList.add("correct-answer");
-            qBlock.style.borderColor = "var(--warning)";
-          }
-        });
-
-       
-        const percentage = Math.round((correct / totalQuestions) * 100);
-        let feedback = "";
-        
-        if (percentage >= 90) {
-          feedback = "Excelent! Ai o înțelegere foarte bună a acestui subiect.";
-        } else if (percentage >= 70) {
-          feedback = "Bun! Dar mai sunt câteva lucruri pe care ar trebui să le revezi.";
-        } else if (percentage >= 50) {
-          feedback = "Acceptabil. Ar fi bine să studiezi mai mult acest subiect.";
+        if (answerIndex === question.correctIndex) {
+          if (selectedLabel) selectedLabel.classList.add("correct-answer");
+          correct++;
         } else {
-          feedback = "Trebuie să mai lucrezi la acest subiect. Încearcă să revezi materialul.";
+          if (selectedLabel) selectedLabel.classList.add("incorrect-answer");
+          if (correctLabel) correctLabel.classList.add("correct-answer");
         }
+      } else {
+       
+        const correctLabel = labels[question.correctIndex];
+        if (correctLabel) correctLabel.classList.add("correct-answer");
+        qBlock.style.borderColor = "var(--warning)";
+      }
+    });
 
-        
-        const resultsDiv = document.getElementById("testResults");
-        resultsDiv.innerHTML = `
-          <div class="test-score">Rezultatul tău</div>
-          <div class="test-percentage">${percentage}%</div>
-          <div class="test-feedback">${feedback}</div>
-          <div>Ai răspuns corect la <strong>${correct}</strong> din <strong>${totalQuestions}</strong> întrebări.</div>
-        `;
-        resultsDiv.style.display = "block";
-
-
-        resultsDiv.scrollIntoView({ behavior: "smooth" });
-      });
+ 
+    const percentage = Math.round((correct / totalQuestions) * 100);
+    let feedback = "";
+    
+    if (percentage >= 90) {
+      feedback = "Excelent! Ai o înțelegere foarte bună a acestui subiect.";
+    } else if (percentage >= 70) {
+      feedback = "Bun! Dar mai sunt câteva lucruri pe care ar trebui să le revezi.";
+    } else if (percentage >= 50) {
+      feedback = "Acceptabil. Ar fi bine să studiezi mai mult acest subiect.";
+    } else {
+      feedback = "Trebuie să mai lucrezi la acest subiect. Încearcă să revezi materialul.";
     }
+
+    
+    const resultsDiv = document.getElementById("testResults");
+    resultsDiv.innerHTML = `
+      <div class="test-score">Rezultatul tău</div>
+      <div class="test-percentage">${percentage}%</div>
+      <div class="test-feedback">${feedback}</div>
+      <div>Ai răspuns corect la <strong>${correct}</strong> din <strong>${totalQuestions}</strong> întrebări.</div>
+    `;
+    resultsDiv.style.display = "block";
+
+    resultsDiv.scrollIntoView({ behavior: "smooth" });
+  });
+}
   </script>
 </body>
 </html>
