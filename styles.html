@@ -319,6 +319,29 @@
       }
     }
 
+    .takeTest{
+      display: none;
+      position:fixed;
+      top: 5%;
+      right:5%;
+      height: 90vh;
+      width: 90vw;
+      background: rgba(30, 30, 45, 0.805);
+      z-index:1001;
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px,
+                  rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, 
+                  rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, 
+                  rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset,
+                  rgba(104, 46, 240, 0.4) 5px 5px, 
+                  rgba(82, 46, 240, 0.3) 10px 10px, 
+                  rgba(82, 46, 240, 0.2) 15px 15px, 
+                  rgba(78, 46, 240, 0.1) 20px 20px, 
+                  rgba(111, 46, 240, 0.05) 25px 25px;
+      border-radius: 10px;
+    }
+
+
+
   
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
@@ -331,6 +354,7 @@
   </style>
 </head>
 <body>
+  <div class="takeTest"></div>
   <div class="container">
     <div class="logo-container">
       <img src="logo1.png" alt="Thinkr Logo" class="logo">
@@ -741,7 +765,8 @@
                       ...formData,
                       userId: currentUser.uid,
                       createdAt: new Date(),
-                      test: result.title
+                      test: result,
+                      title: result.title
                   })
                   console.log(result);
                   await takeTest(result.title);
@@ -755,7 +780,8 @@
 
 
           function takeTest(title){
-            alert(title);
+
+            alert(`Testul ${title} este acum oe ecran `);
           }
     
   </script>
