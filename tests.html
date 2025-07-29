@@ -567,7 +567,7 @@
     </section>
   </div>
 
-  <script type="module">
+<script type="module">
     import { auth, db } from './firebase.js';
     import {onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js';
     import {addDoc,collection, query, getDocs, where } from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js';
@@ -964,7 +964,7 @@ onAuthStateChanged(auth, async (user) => {
       if (!res.ok) throw new Error(result.error || "Eroare la generare lectie");
 
       await addDoc(collection(db, "lectures"), {
-        lesson: result,
+        lesson: result.content,
         userId: currentUser.uid,
         createdAt: new Date(),
         title: data.title
@@ -1003,7 +1003,7 @@ async function displayFullLesson(title) {
   const displayLessons = document.getElementById("lecturesDisplay");
 
   const div = document.createElement("div");
-  div.innerHTML = data.content;
+  div.innerHTML = data;
   displayLessons.appendChild(div);
 }
 
