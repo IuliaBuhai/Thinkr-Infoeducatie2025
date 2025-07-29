@@ -989,6 +989,7 @@ async function displayFullLesson(title) {
   const lecQuery = query(
     collection(db, "lectures"),
     where("title", "==", title)
+    where("userId", "==", currentUser.uid)
   );
 
   const snapshot = await getDocs(lecQuery);
