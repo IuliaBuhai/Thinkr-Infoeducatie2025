@@ -450,7 +450,7 @@
     async function takeTest(title) {
       const testQuery = query(
         collection(db, "generatedTests"),
-        where("userId", currentUser.uid),
+        where("userId", "==", currentUser.uid),
         where("title", "==", title)
       );
       const snapshot = await getDocs(testQuery);
