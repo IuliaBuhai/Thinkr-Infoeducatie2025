@@ -573,7 +573,15 @@
     import {addDoc,collection, query, getDocs, where } from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js';
 
     let currentUser = null;
-
+    onAuthStateChanged(auth, async (user) => {
+    if (!user) return window.location.href = 'login.html';
+    currentUser = user;
+    initTestForm();
+  
+    await displayTestResultHistory();
+    await loadAllLectures();
+  
+  });
     function initTestForm(){
       const form = document.getElementById("generateTest");
       
@@ -941,14 +949,7 @@ function showTestResult(questions, title, score) {
 }
 
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return window.location.href = 'login.html';
-  currentUser = user;
-  initTestForm();
 
-  
-  await displayTestResultHistory();
-});
 
 
     async function getLecture(data){
@@ -1005,6 +1006,28 @@ async function displayFullLesson(title) {
   const div = document.createElement("div");
   div.innerHTML = data;
   displayLessons.appendChild(div);
+}
+
+async function loadAllLectures() {
+const lecQuery = query(
+  collection(db, "lectures"),
+  where("userId", "==", currentUser.uid)
+);
+
+const snapshot = await getDocs(lecQuery);
+if (snapshot.empty) return;
+
+const displayLessons = document.getElementById("lecturesDisplay");
+displayLessons.innerHTML = "<h3>Lectiile tale:</h3>";
+
+snapshot.forEach(doc => {
+  const data = doc.data();
+  const h2 = document.createElement("h2");
+  h2.textContent = data.title;
+  h2.onclick = () => displayFullLesson(data.title);
+  h2.style.cursor = "pointer";
+  displayLessons.appendChild(h2);
+});
 }
 
 
