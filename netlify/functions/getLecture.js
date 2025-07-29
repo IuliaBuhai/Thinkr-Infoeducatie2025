@@ -32,10 +32,10 @@ export async function handler(event) {
 
     const raw = completion.choices[0].message.content;
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ lesson: raw }), 
-    };
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ content: raw }),
+      };
   } catch (err) {
     console.error("Error in generateLecture", err);
     return {
