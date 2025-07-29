@@ -745,7 +745,10 @@
           await addDoc(collection(db, "results"),{
             userId: currentUser.uid,
             result: percentage,
-            testTitle: title
+            testTitle: title,
+            createdAt: new Date(),
+            questions: test.questions, 
+            ansers: userAnswrs
           })
           
 
@@ -794,6 +797,156 @@
           resultsDiv.scrollIntoView({ behavior: "smooth" });
   });
 }
+
+
+async function displayTestResultHistory() {
+  const resultsDiv = document.getElementById('resultDisplay');
+  resultsDiv.style.display = 'block';
+  resultsDiv.innerHTML = '<h3>Istoric teste</h3><div id="historyList"></div>';
+
+  const historyList = document.getElementById('historyList');
+  historyList.style.marginTop = '1rem';
+
+  const testQuery = query(
+    collection(db, "results"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(testQuery);
+
+  if (snapshot.empty) {
+    historyList.innerHTML = '<p>Nu există rezultate salvate.</p>';
+    return;
+  }
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    
+    const title = data.testTitle || data.title || "Test fără titlu";
+    const score = data.result;
+    const questions = data.questions;  
+    const resultId = doc.id;
+
+    const item = document.createElement('div');
+    item.className = 'score-item';
+    item.style.cursor = 'pointer';
+    item.style.border = '1px solid transparent';
+    item.style.transition = 'border-color 0.3s ease';
+    item.innerHTML = `<strong>${title}</strong> — Scor: <span>${score}%</span>`;
+t
+    item.addEventListener('mouseenter', () => item.style.borderColor = 'var(--accent-blue)');
+    item.addEventListener('mouseleave', () => item.style.borderColor = 'transparent');
+
+    item.onclick = () => showTestResult(questions, title, score);
+
+    historyList.appendChild(item);
+  });
+}
+
+function showTestResult(questions, title, score) {
+  const takeTestDiv = document.querySelector('.takeTest');
+  takeTestDiv.innerHTML = `
+    <div class="test-header">
+      <h2 class="test-title">${title}</h2>
+      <button class="close-test" onclick="document.querySelector('.takeTest').style.display='none'">×</button>
+    </div>
+    <form id="testResultForm"></form>
+    <div class="test-results" id="testResultDisplay"></div>
+  `;
+
+  const form = document.getElementById('testResultForm');
+
+  
+  questions.forEach((question, index) => {
+    const qBlock = document.createElement('div');
+    qBlock.className = 'question-block';
+    qBlock.dataset.index = index;
+
+    const qText = document.createElement('p');
+    qText.className = 'test-question';
+    qText.dataset.number = `Q${index + 1}.`;
+    qText.textContent = question.question;
+    qBlock.appendChild(qText);
+
+    const answerGroup = document.createElement('div');
+    answerGroup.className = 'test-options';
+
+    question.options.forEach((opt, optIndex) => {
+      const label = document.createElement('label');
+      label.className = 'test-label';
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = `question-${index}`;
+      input.value = optIndex;
+      input.disabled = true; 
+      input.id = `result-q${index}-opt${optIndex}`;
+
+      const span = document.createElement('span');
+      span.textContent = opt;
+
+      label.appendChild(input);
+      label.appendChild(span);
+      answerGroup.appendChild(label);
+
+      if (optIndex === question.correctIndex) {
+        label.classList.add('correct-answer');
+      }
+    });
+
+
+    const explanation = document.createElement('div');
+    explanation.className = 'test-explanation';
+    explanation.innerHTML = `<strong>Explicație:</strong> ${question.explanation}`;
+    explanation.style.display = 'block'; 
+    qBlock.appendChild(answerGroup);
+    qBlock.appendChild(explanation);
+    form.appendChild(qBlock);
+  });
+
+  
+  const resultDisplay = document.getElementById('testResultDisplay');
+  resultDisplay.style.display = 'block';
+  resultDisplay.innerHTML = `
+    <div class="test-score">Rezultatul tău</div>
+    <div class="test-percentage">${score}%</div>
+    <button id="goToLectureBtn" style="
+      margin-top: 1.5rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
+      transition: var(--transition);
+    ">Crează o lecție pe baza testului</button>
+  `;
+
+ 
+  document.getElementById('goToLectureBtn').onclick = () => {
+    if (typeof getLecture === 'function') {
+      getLecture({ title, questions, score }); 
+    } else {
+      alert("Funcția getLecture nu este definită încă.");
+    }
+  };
+
+  takeTestDiv.style.display = 'block';
+  takeTestDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return window.location.href = 'login.html';
+  currentUser = user;
+  initTestForm();
+
+  
+  await displayTestResultHistory();
+});
+
   </script>
 </body>
 </html>
