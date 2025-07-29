@@ -13,47 +13,72 @@ export async function handler(event) {
   });
 
   try {
-    const { grade, subject, testTitle} = JSON.parse(event.body);
-    
-    let prompt = `
-          Creează un test pentru disciplina "${subject}", destinat unui elev de clasa a ${grade}-a, pe tema "${testTitle}".
+    const { grade, subject, testTitle, userId } = JSON.parse(event.body);
 
-          Cerințe:
-          - Testul trebuie să conțină exact 10 întrebări.
-          - Întrebările vor fi de dificultate medie și ridicată.
-          - Fiecare întrebare va avea:
-            - Minim două variante de răspuns (alege răspunsuri multiple dacă este cazul).
-            - Un câmp "correctAnswers" cu indicarea răspunsurilor corecte.
-            - O explicație clară a rezolvării.
+    const prompt = `
+Creează un test pentru disciplina "${subject}", destinat unui elev de clasa a ${grade}-a, pe tema "${testTitle}".
 
-          Format de ieșire (JSON):
+Cerințe:
+- Testul trebuie să conțină exact 10 întrebări.
+- Întrebările trebuie să fie de dificultate medie sau ridicată.
+- Fiecare întrebare trebuie să aibă:
+  - 4 variante de răspuns (a, b, c, d)
+  - Doar un singur răspuns corect (indexul răspunsului corect între 0 și 3, în câmpul "correctIndex")
+  - O explicație clară a răspunsului
 
-          {
-            "title": "Titlul testului",
-            "questions": [
-              {
-                "question": "Întrebarea 1...",
-                "options": ["Răspuns A", "Răspuns B", "Răspuns C", "Răspuns D"],
-                "correctAnswers": [0, 2],
-                "explanation": "Explicația detaliată..."
-              },
-              ...
-            ]
-          }
-          `.trim();
+Formatul trebuie să fie JSON valid, astfel:
+
+{
+  "title": "Titlul testului",
+  "questions": [
+    {
+      "question": "Textul întrebării...",
+      "options": ["Răspuns A", "Răspuns B", "Răspuns C", "Răspuns D"],
+      "correctIndex": 1,
+      "explanation": "Explicația răspunsului..."
+    }
+  ]
+}
+`.trim();
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", 
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
     });
 
     let raw = completion.choices[0].message.content;
-  
-    if (raw.startsWith("```json")) {
-      raw = raw.replace(/```json|```/g, "").trim();
+
+   
+    if (raw.startsWith("```")) {
+      raw = raw.replace(/```(json)?|```/g, "").trim();
     }
 
-    const plan = JSON.parse(raw);
+    let plan;
+    try {
+      plan = JSON.parse(raw);
+    } catch (err) {
+      console.error("❌ JSON parsing error:", err);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "OpenAI a returnat un JSON invalid." }),
+      };
+    }
+
+    if (
+      !plan?.title ||
+      !Array.isArray(plan.questions) ||
+      !plan.questions.every(q =>
+        q.question && Array.isArray(q.options) && q.options.length === 4 &&
+        typeof q.correctIndex === "number" &&
+        typeof q.explanation === "string"
+      )
+    ) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Structura JSON generată este invalidă." }),
+      };
+    }
+
 
     return {
       statusCode: 200,
@@ -61,10 +86,10 @@ export async function handler(event) {
     };
 
   } catch (err) {
-    console.error("Error in generatePlan:", err);
+    console.error("❌ generatePlan error:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Eroare la generarea planului" }),
+      body: JSON.stringify({ error: "Eroare la generarea testului" }),
     };
   }
 }
