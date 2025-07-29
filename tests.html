@@ -988,7 +988,7 @@ onAuthStateChanged(auth, async (user) => {
 async function displayFullLesson(title) {
   const lecQuery = query(
     collection(db, "lectures"),
-    where("title", "==", title)
+    where("title", "==", title),
     where("userId", "==", currentUser.uid)
   );
 
