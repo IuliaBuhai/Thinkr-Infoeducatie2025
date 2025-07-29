@@ -837,7 +837,7 @@ async function displayTestResultHistory() {
     item.style.border = '1px solid transparent';
     item.style.transition = 'border-color 0.3s ease';
     item.innerHTML = `<strong>${title}</strong> — Scor: <span>${score}%</span>`;
-t
+
     item.addEventListener('mouseenter', () => item.style.borderColor = 'var(--accent-blue)');
     item.addEventListener('mouseleave', () => item.style.borderColor = 'transparent');
 
