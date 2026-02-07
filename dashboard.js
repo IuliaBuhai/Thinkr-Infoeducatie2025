@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { addDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+import { addDoc,setDoc, collection, doc, query, where, orderBy, getDocs, getDoc, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-storage.js";
 
 Chart.register(ChartDataLabels);
@@ -30,6 +30,7 @@ let progressCircle = new ProgressBar.Circle("#goalProgressBar", {
 
 
 const greetingElement = document.getElementById('greeting');
+
 const logoutBtn = document.getElementById('logoutBtn');
 const form = document.getElementById("StudyPlanForm");
 const loading = document.getElementById("loading");
@@ -46,11 +47,16 @@ onAuthStateChanged(auth, async (user) => {
   try {
    
     const userSnap = await getDoc(doc(db, "users", user.uid));
+    const userData = await getDoc(doc(db, "userData", user.uid))
     if (userSnap.exists()) {
       const { name = "Utilizator", username = "" } = userSnap.data();
       greetingElement.textContent = `Bine ai venit, ${name} (${username})!`;
     } else {
       greetingElement.textContent = "Bine ai venit!";
+    }
+
+    if(!userData.exists()){
+      await getDataFromUser();
     }
 
     displayPlansHistory();
@@ -84,6 +90,81 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Error initializing dashboard:", error);
   }
 });
+
+
+async function getDataFromUser(){
+  createUserInfoForm('dataForm');
+  const submitForm = document.getElementById('user-info-form');
+
+  submitForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const level = document.getElementById('level').value.trim();
+    const age = document.getElementById('age').value.trim();
+    const country = document.getElementById('country').value.trim();
+    const major = document.getElementById('major').value.trim();
+
+    if (!level || !age || !country || !major) {
+        alert("Completează toate câmpurile.");
+        return;
+      }
+    
+    try {
+        const user = auth.currentUser;
+
+        await setDoc(collection(db, "userData",user.uid), {
+          userId: user.uid,
+          level,
+          age,
+          country,
+          major,
+          createdAt: new Date()
+        });
+
+      } catch (err) {
+        console.log(err);
+      }});
+    }
+
+
+function createUserInfoForm(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = `
+        <form id="user-info-form">
+            <h3>User Information</h3>
+
+            <label>
+                Education Level
+                <select name="education_level" id = "level" required>
+                    <option value="">Alege</option>
+                    <option value="high_school">Liceu</option>
+                    <option value="bachelor">Licență</option>
+                    <option value="master">Master</option>
+                    <option value="phd">Doctorat</option>
+                    <option value="other">Alta<option>
+                </select>
+            </label>
+
+            <label>
+                Vârsta
+                <input type="number" name="age" min="10" max="100" id ="age" required />
+            </label>
+
+            <label>
+                Țara
+                <input type="text" name="country" placeholder="e.g. Romania" id="country" required />
+            </label>
+
+            <label>
+                Specializare/Domeniu
+                <input type="text" name="major" placeholder="e.g. Informatică / Teologie" id = "major" required />
+            </label>
+
+            <button type="submit" id = "submitUserData">Submit</button>
+        </form>
+    `;
+}
 
 
 function initPlansForm() {
