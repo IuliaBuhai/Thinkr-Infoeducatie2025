@@ -374,7 +374,7 @@ function initTimerLogic() {
       breaks,
       rounds
     });
-
+    submitBtn.disabled = true;
     displaySessionsHistory();
     updateProgressChart();
     await loadTagSuggestions();
@@ -1215,3 +1215,5 @@ async function addSession() {
     }
   });
 }
+
+
