@@ -332,9 +332,12 @@ function initTimerLogic() {
   let seconds = 0;
   let running = false;
   let intervalId;
+  let breaks = 0;
+  let rounds = 0;
 
   startBtn.addEventListener("click", (e) => {
     e.preventDefault();
+    rounds += 1;
     if (!running) {
       running = true;
       intervalId = setInterval(() => {
@@ -347,6 +350,7 @@ function initTimerLogic() {
   pauseBtn.addEventListener("click", (e) => {
     e.preventDefault();
     running = false;
+    breaks += 1;
     clearInterval(intervalId);
   });
   
@@ -366,7 +370,9 @@ function initTimerLogic() {
       seconds,
       title,
       description,
-      tag
+      tag,
+      breaks,
+      rounds
     });
 
     displaySessionsHistory();
@@ -1109,7 +1115,7 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
     e.preventDefault();
     running = false;
     runningBreak = true;
-    
+
     breaks += 1;
     clearInterval(timer);
   });
@@ -1209,5 +1215,3 @@ async function addSession() {
     }
   });
 }
-
-
