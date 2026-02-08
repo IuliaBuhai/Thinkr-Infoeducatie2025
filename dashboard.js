@@ -111,7 +111,7 @@ async function getDataFromUser(){
     try {
         const user = auth.currentUser;
 
-        await setDoc(collection(db, "userData",user.uid), {
+        await setDoc(doc(db, "userData",user.uid), {
           userId: user.uid,
           level,
           age,
@@ -1193,3 +1193,4 @@ async function addSession() {
     }
   });
 }
+
