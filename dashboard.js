@@ -1030,6 +1030,12 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
   let isBreak = false;
   let currentCycle = 1;
   let totalFocusSeconds = 0;
+  let breaks = 0;
+  let rounds = 0;
+  let averageBreak = 0;
+  let averageRounds = 0;
+  let timerBreak = null;
+  let runningBreak = 0;
 
   const startBtn = document.getElementById('startBtnPomodoro');
   const pauseBtn = document.getElementById('pauseBtnPomodoro');
@@ -1044,7 +1050,9 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
         seconds: totalFocusSeconds,
         title: "Sesiune Pomodoro",
         description: `Pomodoro completat cu ${cycles} runde în  ${focusMinutes} minute`,
-        tag: "Pomodoro"
+        tag: "Pomodoro",
+        breaks: breaks,
+        rounds : rounds
       }).then(() => {
         displaySessionsHistory();
         updateProgressChart();
@@ -1053,7 +1061,7 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
         drawTimeDistributionChart();
         drawWeeklyChart();
         displayXp();
-        if (totalFocusSeconds >= 1200) updateStudyStreak(); // 20 min = streak
+        if (totalFocusSeconds >= 1200) updateStudyStreak(); 
       });
     }
   }
@@ -1092,12 +1100,17 @@ function startPomodoro(focusMinutes, breakMinutes, cycles) {
 
   startBtn.addEventListener("click", (e) => {
     e.preventDefault();
+    rounds +=1;
+    runningBreak = false;
     startTimer();
   });
 
   pauseBtn.addEventListener("click", (e) => {
     e.preventDefault();
     running = false;
+    runningBreak = true;
+    
+    breaks += 1;
     clearInterval(timer);
   });
 
@@ -1196,6 +1209,5 @@ async function addSession() {
     }
   });
 }
-
 
 
