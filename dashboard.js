@@ -386,6 +386,9 @@ function initTimerLogic() {
     await displayStreak();
     await getBadges();
     alert("Sesiune încheiată, felicitări! Acum e timpul pentru o pauză");
+    timeDisplay.textContent = '00:00:00';
+    startBtn.disabled = false;
+    submitBtn.disabled = false;
   });
 
   resetBtn.addEventListener("click", (e) => {
@@ -1216,6 +1219,3 @@ async function addSession() {
     }
   });
 }
-
-
-
