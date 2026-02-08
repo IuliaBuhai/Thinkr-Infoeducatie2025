@@ -359,7 +359,7 @@ function initTimerLogic() {
     running = false;
     clearInterval(intervalId);
     startBtn.disabled = true;
-
+    submitBtn.disabled = true;
     const title = document.getElementById('sessionTitle').value.trim();
     const description = document.getElementById('sessionDescription').value.trim();
     const tag = document.getElementById('sessionTag').value.trim();
@@ -374,7 +374,7 @@ function initTimerLogic() {
       breaks,
       rounds
     });
-    submitBtn.disabled = true;
+    
     displaySessionsHistory();
     updateProgressChart();
     await loadTagSuggestions();
@@ -395,6 +395,7 @@ function initTimerLogic() {
     seconds = 0;
     timeDisplay.textContent = '00:00:00';
     startBtn.disabled = false;
+    submitBtn.disabled = false;
   });
   
   function updateTimeDisplay() {
@@ -1215,5 +1216,6 @@ async function addSession() {
     }
   });
 }
+
 
 
