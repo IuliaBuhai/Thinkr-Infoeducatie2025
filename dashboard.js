@@ -119,7 +119,7 @@ async function getDataFromUser(){
           major,
           createdAt: new Date()
         });
-      const formData = document.getElemenbtById("dataForm");
+      const formData = document.getElementById("dataForm");
       formData.style.display = "none";
       alert("Datele de utilizator au fost stocate in baza de date");
 
@@ -1196,5 +1196,6 @@ async function addSession() {
     }
   });
 }
+
 
 
