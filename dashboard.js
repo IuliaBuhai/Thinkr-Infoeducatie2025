@@ -95,14 +95,15 @@ onAuthStateChanged(auth, async (user) => {
 async function getDataFromUser(){
   createUserInfoForm('dataForm');
   const submitForm = document.getElementById('user-info-form');
-
+  const formData = document.getElementById("dataForm");
+      formData.style.display = "block";
   submitForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const level = document.getElementById('level').value.trim();
     const age = document.getElementById('age').value.trim();
     const country = document.getElementById('country').value.trim();
     const major = document.getElementById('major').value.trim();
-
+    
     if (!level || !age || !country || !major) {
         alert("Completează toate câmpurile.");
         return;
@@ -119,7 +120,6 @@ async function getDataFromUser(){
           major,
           createdAt: new Date()
         });
-      const formData = document.getElementById("dataForm");
       formData.style.display = "none";
       alert("Datele de utilizator au fost stocate in baza de date");
 
@@ -1219,3 +1219,4 @@ async function addSession() {
     }
   });
 }
+
