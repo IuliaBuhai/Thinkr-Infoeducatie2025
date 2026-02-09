@@ -95,15 +95,14 @@ onAuthStateChanged(auth, async (user) => {
 async function getDataFromUser(){
   createUserInfoForm('dataForm');
   const submitForm = document.getElementById('user-info-form');
-  const formData = document.getElementById("dataForm");
-      formData.style.display = "block";
+
   submitForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const level = document.getElementById('level').value.trim();
     const age = document.getElementById('age').value.trim();
     const country = document.getElementById('country').value.trim();
     const major = document.getElementById('major').value.trim();
-    
+
     if (!level || !age || !country || !major) {
         alert("Completează toate câmpurile.");
         return;
@@ -120,6 +119,7 @@ async function getDataFromUser(){
           major,
           createdAt: new Date()
         });
+      const formData = document.getElementById("dataForm");
       formData.style.display = "none";
       alert("Datele de utilizator au fost stocate in baza de date");
 
@@ -135,10 +135,10 @@ function createUserInfoForm(containerId) {
 
     container.innerHTML = `
         <form id="user-info-form">
-            <h3>Date utilizator</h3>
+            <h3>User Information</h3>
 
             <label>
-                Nivel educație
+                Education Level
                 <select name="education_level" id = "level" required>
                     <option value="">Alege</option>
                     <option value="high_school">Liceu</option>
@@ -605,7 +605,7 @@ async function updateProgressChart() {
 }
 
 async function drawTimeDistributionChart() {
-  try {
+try {
     document.getElementById('distributionLoader').style.display = 'flex';
     
     const todayStart = new Date();
@@ -614,212 +614,207 @@ async function drawTimeDistributionChart() {
     tomorrowStart.setDate(tomorrowStart.getDate() + 1);
 
     const sessionsToday = await getDocs(query(
-      collection(db, "studySessions"),
-      where("userId", "==", currentUser.uid),
-      where("createdAt", ">=", todayStart),
-      where("createdAt", "<", tomorrowStart)
+        collection(db, "studySessions"),
+        where("userId", "==", currentUser.uid),
+        where("createdAt", ">=", todayStart),
+        where("createdAt", "<", tomorrowStart)
     ));
 
     const tagDurations = {};
+    let totalSeconds = 0;
     sessionsToday.forEach(doc => {
-      const data = doc.data();
-      const tag = data.tag || "Altele";
-      tagDurations[tag] = (tagDurations[tag] || 0) + (data.seconds || 0);
+        const data = doc.data();
+        const tag = data.tag || "Altele";
+        tagDurations[tag] = (tagDurations[tag] || 0) + (data.seconds || 0);
+        totalSeconds += (data.seconds || 0);
     });
 
     const labels = Object.keys(tagDurations);
     const data = Object.values(tagDurations).map(sec => (sec / 60).toFixed(1));
+    const totalMinutes = (totalSeconds / 60).toFixed(0);
 
-  
-    const generateColors = (count) => {
-      const colors = [];
-      const hueStep = 360 / count;
-      for (let i = 0; i < count; i++) {
-        colors.push(`hsl(${i * hueStep}, 70%, 60%)`);
-      }
-      return colors;
-    };
+    const palette = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
 
     const ctx = document.getElementById('timeDistributionChart').getContext('2d');
     if (window.timeChart) window.timeChart.destroy();
     
     window.timeChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: generateColors(labels.length),
-          borderWidth: 0,
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%',
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              color: 'var(--text-primary)',
-              padding: 20,
-              font: {
-                family: 'Inter'
-              },
-              usePointStyle: true
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const total = context.dataset.data.reduce((a, b) => a + parseFloat(b), 0);
-                const value = parseFloat(context.raw);
-                const percentage = Math.round((value / total) * 100);
-                return `${context.label}: ${value} min (${percentage}%)`;
-              }
-            }
-          },
-          datalabels: {
-            formatter: (value, context) => {
-              const total = context.chart.data.datasets[0].data.reduce((a, b) => a + parseFloat(b), 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${percentage}%`;
-            },
-            color: 'white',
-            font: {
-              weight: 'bold'
-            }
-          }
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: palette,
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                color: '#ffffff',
+                hoverOffset: 10,
+                borderRadius: 6
+            }]
         },
-        animation: {
-          animateScale: true,
-          animateRotate: true
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '80%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20,
+                        font: { family: 'Inter', size: 13, weight: '500' },
+                        color: '#ffffff'
+                    }
+                },
+               
+                beforeDraw: function(chart) {
+                    var width = chart.width,
+                        height = chart.height,
+                        ctx = chart.ctx;
+                    ctx.restore();
+                    var fontSize = (height / 160).toFixed(2);
+                    ctx.font = fontSize + "em Inter";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#ffffff";
+                    
+                    var text = totalMinutes + " min",
+                        textX = Math.round((width - ctx.measureText(text).width) / 2),
+                        textY = height / 2;
+                    ctx.fillText(text, textX, textY);
+                    ctx.save();
+                }
+            }
         }
-      },
-      plugins: [ChartDataLabels]
     });
-
-  } catch (error) {
-    console.error("Error drawing time distribution chart:", error);
-  } finally {
-    document.getElementById('distributionLoader').style.display = 'none';
-  }
+} catch (error) { console.error(error); }
+finally { document.getElementById('distributionLoader').style.display = 'none'; }
 }
 
 async function drawWeeklyChart() {
-  console.log('drawWeeklyChart creat:', new Date().toISOString());
   try {
-    document.getElementById('weeklyLoader').style.display = 'flex';
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const weekStart = new Date(today);
-    weekStart.setDate(weekStart.getDate() - 6); 
+      const loader = document.getElementById('weeklyLoader');
+      if (loader) loader.style.display = 'flex';
 
-    const sessions = await getDocs(query(
-      collection(db, "studySessions"),
-      where("userId", "==", currentUser.uid),
-      where("createdAt", ">=", weekStart),
-      where("createdAt", "<=", today)
-    ));
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const weekStart = new Date(today);
+      weekStart.setDate(weekStart.getDate() - 6);
 
- 
-    const dailyTotals = {};
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateKey = date.toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric' });
-      dailyTotals[dateKey] = 0;
-    }
+      const sessions = await getDocs(query(
+          collection(db, "studySessions"),
+          where("userId", "==", currentUser.uid),
+          where("createdAt", ">=", weekStart),
+          where("createdAt", "<=", today)
+      ));
 
-    
-    sessions.forEach(doc => {
-      const sessionDate = doc.data().createdAt.toDate();
-      const dateKey = sessionDate.toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric' });
-      dailyTotals[dateKey] += doc.data().seconds || 0;
-    });
-
- 
-    const labels = [];
-    const data = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateKey = date.toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric' });
-      labels.push(dateKey);
-      data.push((dailyTotals[dateKey] / 60).toFixed(1)); 
-    }
-
-    const ctx = document.getElementById('weeklyStudyChart').getContext('2d');
-    if (window.weeklyChart) window.weeklyChart.destroy();
-
-    window.weeklyChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Ore de studiu',
-          data: data,
-          backgroundColor: (context) => {
-            const chart = context.chart;
-            const { ctx, chartArea } = chart;
-            if (!chartArea) return;
-            
-            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            gradient.addColorStop(0, 'rgba(77, 142, 255, 0.2)');
-            gradient.addColorStop(1, 'rgba(77, 142, 255, 0.8)');
-            return gradient;
-          },
-          borderColor: 'rgba(77, 142, 255, 1)',
-          borderWidth: 1,
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.05)'
-            },
-            ticks: {
-              color: 'var(--text-secondary)',
-              callback: (value) => `${value} min`
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              color: 'var(--text-secondary)'
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const hours = (context.raw / 60).toFixed(1);
-                return `${hours} ore`;
-              }
-            }
-          }
-        },
-        animation: false,
+      const dailyTotals = {};
+      for (let i = 0; i < 7; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+          const dateKey = date.toLocaleDateString('ro-RO', { weekday: 'short' });
+          dailyTotals[dateKey] = 0;
       }
-    });
 
-  } catch (error) {
-    console.error("Error drawing weekly chart:", error);
-  } finally {
-    document.getElementById('weeklyLoader').style.display = 'none';
+      sessions.forEach(doc => {
+          const dateKey = doc.data().createdAt.toDate().toLocaleDateString('ro-RO', { weekday: 'short' });
+          if (dailyTotals[dateKey] !== undefined) dailyTotals[dateKey] += doc.data().seconds || 0;
+      });
+
+      const labels = Object.keys(dailyTotals).reverse();
+      const data = Object.values(dailyTotals).reverse().map(sec => (sec / 60).toFixed(1));
+
+      const canvas = document.getElementById('weeklyStudyChart');
+      const ctx = canvas.getContext('2d');
+      
+      // FIX: Gradient direction (Top to Bottom)
+      const chartGradient = ctx.createLinearGradient(0, 50, 0, 300);
+      chartGradient.addColorStop(0, '#6366f1');   // Bright indigo at top
+      chartGradient.addColorStop(1, 'rgba(99, 102, 241, 0.1)'); // Faded at bottom
+
+      if (window.weeklyChart) window.weeklyChart.destroy();
+
+      window.weeklyChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: labels,
+              datasets: [{
+                  label: 'Minute',
+                  data: data,
+                  backgroundColor: chartGradient,
+                  hoverBackgroundColor: '#818cf8',
+                  borderRadius: 6,
+                  borderSkipped: false,
+                  maxBarThickness: 35
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: {
+                  padding: { top: 30, bottom: 10 } // Extra space for labels
+              },
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      border: { display: false },
+                      grid: { 
+                          color: 'rgba(255, 255, 255, 0.08)', // Fainter grid lines
+                          drawTicks: false 
+                      },
+                      title: { 
+                          display: true, 
+                          text: 'MINUTE', 
+                          color: 'rgba(255, 255, 255, 0.6)', 
+                          font: { size: 10, weight: '700', family: 'Inter' } 
+                      },
+                      ticks: { 
+                          color: '#ffffff', 
+                          font: { size: 11 },
+                          padding: 10
+                      }
+                  },
+                  x: {
+                      border: { display: false },
+                      grid: { display: false },
+                      title: { 
+                          display: true, 
+                          text: 'ULTIMELE 7 ZILE', 
+                          color: 'rgba(255, 255, 255, 0.6)', 
+                          font: { size: 10, weight: '700', family: 'Inter' },
+                          padding: { top: 15 }
+                      },
+                      ticks: { 
+                          color: '#ffffff', 
+                          font: { size: 12, weight: '500' },
+                          padding: 10 // Pushes labels away from the bars
+                      }
+                  }
+              },
+              plugins: {
+                  legend: { display: false },
+                  // FIX: Remove overlapping 0.0 text by disabling datalabels for tiny values
+                  datalabels: {
+                      display: (context) => context.dataset.data[context.dataIndex] > 0,
+                      color: '#ffffff',
+                      anchor: 'end',
+                      align: 'top',
+                      offset: 4,
+                      font: { weight: 'bold', size: 11 }
+                  },
+                  tooltip: {
+                      backgroundColor: '#1e293b',
+                      padding: 12,
+                      cornerRadius: 10,
+                      displayColors: false
+                  }
+              }
+          },
+          plugins: [ChartDataLabels] // Ensure this is active for the numbers above bars
+      });
+  } catch (error) { 
+      console.error(error); 
+  } finally { 
+      if (document.getElementById('weeklyLoader')) document.getElementById('weeklyLoader').style.display = 'none'; 
   }
 }
 
@@ -1219,5 +1214,3 @@ async function addSession() {
     }
   });
 }
-
-
