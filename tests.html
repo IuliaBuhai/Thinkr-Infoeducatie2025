@@ -547,6 +547,8 @@
           <div>
             <label for="titlu">Titlu lecție / test (din ce dai test/ pentru ce te pregătești)</label>
             <input type="text" id="titlu" placeholder="Ex: Acizi și baze" required />
+            <input type="file" id="sourceFile" accept=".pdf,.txt,.docx" required />
+
           </div>
         </div>
         
@@ -591,20 +593,33 @@
           const subject = document.getElementById("materie").value;
           const testTitle = document.getElementById("titlu").value;
 
-          const formData = {
-            grade,
-            subject,
-            testTitle
+          const fileInput = document.getElementById("sourceFile");
+          const file = fileInput.files[0];
+          
+          if (!file) {
+          alert("Te rog încarcă un fișier.");
+          return;
           }
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("grade", grade);
+          formData.append("subject", subject);
+          formData.append("testTitle", testTitle);
 
           try {
-            const res = await fetch("/.netlify/functions/generateTests", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(formData)
-            });
+            const res = await fetch("/.netlify/functions/generateTestFromFile", {
+            method: "POST",
+            body: formData
+          });
 
             const result = await res.json();
+            const normalizedQuestions = result.questions.map(q => ({
+              question: q.question,
+              options: q.options,
+              correctIndex: q.options.indexOf(q.answer),
+              explanation: "Răspuns generat din documentul încărcat."
+            }));
+
             if (!res.ok) throw new Error(result.error || "Eroare la generare test");
 
             await addDoc(collection(db, "generatedTests"), {
@@ -612,10 +627,12 @@
                 userId: currentUser.uid,
                 createdAt: new Date(),
                 test: result,
-                title: result.title
+                title: result.title,
+              questions: normalizedQuestions
+
             });
             
-            await takeTest(result.title, result.questions);
+           await takeTest(testTitle, normalizedQuestions);
           } catch(err) {
             alert(err.message);
           }
