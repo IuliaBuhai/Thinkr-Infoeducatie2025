@@ -651,13 +651,15 @@
             height:2.3rem;
             width: 2.3rem
         }
-       streakWarning {
-            background-color: var(--text-primary);
-            color: var(--danger);
+       #streakWarning {
+            background-color: var(--danger);
+            color: var(--text-primary);
             box-shadow: 0 4px 15px var(--danger);
             border-radius: 5px;
             padding: 10px;
             text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
         }
 
 
