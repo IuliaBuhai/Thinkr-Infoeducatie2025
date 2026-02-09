@@ -611,7 +611,8 @@
             method: "POST",
             body: formData
           });
-
+            const rawText = await res.text();
+            console.log("RAW RESPONSE:", rawText);
             const result = await res.json();
             const normalizedQuestions = result.questions.map(q => ({
               question: q.question,
