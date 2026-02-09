@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "openai": "^5.8.2",
-    "@anthropic-ai/sdk": "^0.10.2"
+    "@anthropic-ai/sdk": "^0.10.2",
+    "busboy": "^1.6.0",
+    "openai": "^5.8.2"
   }
 }
