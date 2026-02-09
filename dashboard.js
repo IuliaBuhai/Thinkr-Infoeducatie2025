@@ -135,10 +135,10 @@ function createUserInfoForm(containerId) {
 
     container.innerHTML = `
         <form id="user-info-form">
-            <h3>User Information</h3>
+            <h3>Date utilizator</h3>
 
             <label>
-                Education Level
+                Nivel educație
                 <select name="education_level" id = "level" required>
                     <option value="">Alege</option>
                     <option value="high_school">Liceu</option>
@@ -1219,4 +1219,5 @@ async function addSession() {
     }
   });
 }
+
 
