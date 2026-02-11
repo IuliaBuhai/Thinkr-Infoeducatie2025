@@ -336,15 +336,18 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       overflow-y: auto;
       padding: 2rem;
+      overflow-y: auto;
     }
 
     .test-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      justify-content: center;
       margin-bottom: 2rem;
-      padding-bottom: 1rem;
+      padding: 0.5rem;
       border-bottom: 1px solid rgba(138, 99, 255, 0.3);
+      margin-left: -2rem;
     }
 
     .test-title {
@@ -355,23 +358,26 @@
     }
 
     .close-test {
-      background: rgba(255, 107, 107, 0.2);
+      background: red;
       border: none;
-      color: var(--danger);
-      width: 36px;
-      height: 36px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    
+      height: fit-content;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: var(--transition);
+      position: sticky;
+      top: 1rem;
+      margin-left: auto;
+      z-index: 20;
+      opacity: 0.6;
     }
 
-    .close-test:hover {
-      background: rgba(255, 107, 107, 0.4);
-      transform: rotate(90deg);
-    }
+   
 
     #testForm {
       max-width: 800px;
@@ -548,11 +554,15 @@
             <label for="titlu">Titlu lecție / test (din ce dai test/ pentru ce te pregătești)</label>
             <input type="text" id="titlu" placeholder="Ex: Acizi și baze" required />
           </div>
+          
         </div>
-        
-        <label for="clasa">Clasa</label>
-        <input type="text" id="clasa" required />
-        
+        <div>
+            <label for="detalii">Detalii test</label>
+            <input type="text" id="detalii" placeholder="Ex: Vreau sa vad doar probleme/ Pune întrebări grele" required />
+          
+        <label for="clasa">Clasa/An/Nivel</label>
+        <input type="text" id="clasa" placeholder="Clasa a 12-a / An 1 Master" required />
+        </div>
         <button type="submit" style="margin-top: 1.5rem;">Generează testul</button>
       </form>
     </section>
@@ -590,11 +600,12 @@
           const grade = document.getElementById("clasa").value;
           const subject = document.getElementById("materie").value;
           const testTitle = document.getElementById("titlu").value;
-
+          const details = document.getElementById("detalii").value;
           const formData = {
             grade,
             subject,
-            testTitle
+            testTitle,
+            details
           }
 
           try {
@@ -627,8 +638,9 @@
         takeTestDiv.innerHTML = `
           <div class="test-header">
             <h2 class="test-title">${title}</h2>
+            </div>
             <button class="close-test" onclick="document.querySelector('.takeTest').style.display='none'">×</button>
-          </div>
+          
           <form id="testForm"></form>
           <div class="test-results" id="testResults"></div>
         `;
@@ -859,8 +871,9 @@ function showTestResult(questions, title, score) {
   takeTestDiv.innerHTML = `
     <div class="test-header">
       <h2 class="test-title">${title}</h2>
+      </div>
       <button class="close-test" onclick="document.querySelector('.takeTest').style.display='none'">×</button>
-    </div>
+    
     <form id="testResultForm"></form>
     <div class="test-results" id="testResultDisplay"></div>
   `;
