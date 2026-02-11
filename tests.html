@@ -45,9 +45,16 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 1200px;
       margin: 0 auto;
     }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr; 
+      gap: 2rem;
+      align-items: start;
+    }
+
 
     .logo-container {
       text-align: center;
@@ -539,7 +546,9 @@
     <div class="logo-container">
       <img src="logo1.png" alt="Thinkr Logo" class="logo">
     </div>
-    
+     <h1>Teste</h1>
+    <div class = "main-grid">
+     
     <section class="card fade-in">
       <h2>Generare test</h2>
       <p class="section-description">Generează un test și vezi unde mai ai de învățat</p>
@@ -568,13 +577,15 @@
     </section>
 
     <section class="card fade-in">
-      <div id="resultDisplay" style="display:none;"></div>
-    </section>
-
-    <section class="card fade-in">
       <h1>Lecțiile tale</h1>
       <div id="lecturesDisplay"></div>
     </section>
+    </div>
+    <section class="card fade-in">
+      <div id="resultDisplay" style="display:none;"></div>
+    </section>
+
+    
   </div>
 
 <script type="module">
@@ -872,12 +883,26 @@ function showTestResult(questions, title, score) {
     <div class="test-header">
       <h2 class="test-title">${title}</h2>
       </div>
+      <div class = "generate-lesson-container" style="text-align: center; margin-top: 2rem;">
+      <button id="goToLectureBtn" style="
+      margin-top: 1.5rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
+      transition: var(--transition);
+    ">Crează o lecție pe baza testului</button>
+    </div>
       <button class="close-test" onclick="document.querySelector('.takeTest').style.display='none'">×</button>
-    
+      
     <form id="testResultForm"></form>
+    
     <div class="test-results" id="testResultDisplay"></div>
   `;
-
   const form = document.getElementById('testResultForm');
 
   
@@ -932,18 +957,7 @@ function showTestResult(questions, title, score) {
   const resultDisplay = document.getElementById('testResultDisplay');
   resultDisplay.style.display = 'block';
   resultDisplay.innerHTML = `
-    <button id="goToLectureBtn" style="
-      margin-top: 1.5rem;
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
-      transition: var(--transition);
-    ">Crează o lecție pe baza testului</button>
+    
     <div class="test-score">Rezultatul tău</div>
     <div class="test-percentage">${score}%</div>
   `;
