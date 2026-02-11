@@ -932,8 +932,6 @@ function showTestResult(questions, title, score) {
   const resultDisplay = document.getElementById('testResultDisplay');
   resultDisplay.style.display = 'block';
   resultDisplay.innerHTML = `
-    <div class="test-score">Rezultatul tău</div>
-    <div class="test-percentage">${score}%</div>
     <button id="goToLectureBtn" style="
       margin-top: 1.5rem;
       background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
@@ -946,6 +944,8 @@ function showTestResult(questions, title, score) {
       box-shadow: 0 4px 15px rgba(77, 142, 255, 0.3);
       transition: var(--transition);
     ">Crează o lecție pe baza testului</button>
+    <div class="test-score">Rezultatul tău</div>
+    <div class="test-percentage">${score}%</div>
   `;
 
  
