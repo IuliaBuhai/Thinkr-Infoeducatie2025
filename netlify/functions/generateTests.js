@@ -13,10 +13,10 @@ export async function handler(event) {
   });
 
   try {
-    const { grade, subject, testTitle, userId } = JSON.parse(event.body);
+    const { grade, subject, testTitle,details, userId } = JSON.parse(event.body);
 
     const prompt = `
-Creează un test pentru disciplina "${subject}", destinat unui elev de clasa a ${grade}-a, pe tema "${testTitle}".
+Creează un test pentru disciplina "${subject}", destinat unui elev de clasa/ nivelul  ${grade}, pe tema "${testTitle}".
 
 Cerințe:
 - Testul trebuie să conțină exact 10 întrebări.
@@ -25,7 +25,7 @@ Cerințe:
   - 4 variante de răspuns (a, b, c, d)
   - Doar un singur răspuns corect (indexul răspunsului corect între 0 și 3, în câmpul "correctIndex")
   - O explicație clară a răspunsului
-
+  - urmareste cu strictete aceste detalii: ${details}
 Formatul trebuie să fie JSON valid, astfel:
 
 {
