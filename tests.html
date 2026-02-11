@@ -965,10 +965,10 @@ function showTestResult(questions, title, score) {
  
   document.getElementById('goToLectureBtn').onclick = () => {
     if (typeof getLecture === 'function') {
-      getLecture({ title, questions, score }); 
-      takeTestDiv.style.display = 'none';
-
-      displayFullLesson(title);
+      getLecture({ title, questions, score }).then(() => {
+        takeTestDiv.style.display = 'none';
+        displayFullLesson(title);
+      });
     } else {
       alert("Funcția getLecture nu este definită încă.");
     }
