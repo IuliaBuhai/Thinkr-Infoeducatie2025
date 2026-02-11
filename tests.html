@@ -547,12 +547,10 @@
           <div>
             <label for="titlu">Titlu lecție / test (din ce dai test/ pentru ce te pregătești)</label>
             <input type="text" id="titlu" placeholder="Ex: Acizi și baze" required />
-            <input type="file" id="sourceFile" accept=".pdf,.txt,.docx" required />
-
           </div>
         </div>
         
-        <label for="clasa">Clasa/Anul/Nivelul</label>
+        <label for="clasa">Clasa</label>
         <input type="text" id="clasa" required />
         
         <button type="submit" style="margin-top: 1.5rem;">Generează testul</button>
@@ -593,34 +591,20 @@
           const subject = document.getElementById("materie").value;
           const testTitle = document.getElementById("titlu").value;
 
-          const fileInput = document.getElementById("sourceFile");
-          const file = fileInput.files[0];
-          
-          if (!file) {
-          alert("Te rog încarcă un fișier.");
-          return;
+          const formData = {
+            grade,
+            subject,
+            testTitle
           }
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("grade", grade);
-          formData.append("subject", subject);
-          formData.append("testTitle", testTitle);
 
           try {
-            const res = await fetch("/.netlify/functions/generateTestFromFile", {
-            method: "POST",
-            body: formData
-          });
-            const rawText = await res.text();
-            console.log("RAW RESPONSE:", rawText);
-            const result = await res.json();
-            const normalizedQuestions = result.questions.map(q => ({
-              question: q.question,
-              options: q.options,
-              correctIndex: q.options.indexOf(q.answer),
-              explanation: "Răspuns generat din documentul încărcat."
-            }));
+            const res = await fetch("/.netlify/functions/generateTests", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData)
+            });
 
+            const result = await res.json();
             if (!res.ok) throw new Error(result.error || "Eroare la generare test");
 
             await addDoc(collection(db, "generatedTests"), {
@@ -628,12 +612,10 @@
                 userId: currentUser.uid,
                 createdAt: new Date(),
                 test: result,
-                title: result.title,
-              questions: normalizedQuestions
-
+                title: result.title
             });
             
-           await takeTest(testTitle, normalizedQuestions);
+            await takeTest(result.title, result.questions);
           } catch(err) {
             alert(err.message);
           }
