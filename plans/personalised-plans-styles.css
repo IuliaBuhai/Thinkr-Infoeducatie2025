@@ -184,6 +184,7 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 0.75rem;
+            text-decoration: none;
         }
 
         .nav-buttons a button,
@@ -209,4 +210,9 @@
         .nav-buttons a button:hover,
         .nav-buttons button:hover {
         background: var(--accent-purple);
+        }
+
+
+        a{
+            text-decoration: none;
         }

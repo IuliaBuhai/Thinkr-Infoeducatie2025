@@ -10,28 +10,14 @@
 </head>
 <body>
   <header>
-    <div style="display: flex; align-items: center; gap: 1rem;">
-          <div class="logo-container">
-              <img src="/logo1.png" alt="Thinkr Logo" class="logo">
-          </div>
-      </div>
-      <a href="personalisedPlans.html"><button>PlanneR</button></a>
-</header>
 
+        <h2>Calendarul Tău Săptămânal</h2>
+    <a href="/learning/styles.html"><button>Test stil învățare</button></a>
+    <a href="/tests/tests.html"><button>Generare teste</button></a>
+    <a href="/index.html"><button>Acasa</button></a>
+    <a href="/articles/articole.html"><button>Articole</button></a>
 
-  <h2>Calendarul Tău Săptămânal</h2>
-  <div id="calendar" class="calendar-container"></div>
-
-  <div id="taskModal" class="modal hidden">
-    <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h3 id="modalTitle"></h3>
-      <p id="modalDescription"></p>
-      <p><strong>Durată:</strong> <span id="modalDuration"></span> minute</p>
-      <p><strong>Web:</strong> <span id="modalWeb"></span></p>
-      <p><strong>Cărți:</strong> <span id="modalBooks"></span></p>
-    </div>
-  </div>
+  </header>
 
   <form id="prefForm" style="display: none;">
     <h3>Setează-ți preferințele</h3>
@@ -47,6 +33,22 @@
     <button type="submit" class="button" id = "generatePlanButton">Generează planul pentru săptămâna asta</button>
   </form>
 
+  <h2>Calendarul Tău Săptămânal - Vizualizare calendar</h2>
+  <div id="calendar" class="calendar-container"></div>
+  
+  <div id="taskModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3 id="modalTitle"></h3>
+      <p id="modalDescription"></p>
+      <p><strong>Durată:</strong> <span id="modalDuration"></span> minute</p>
+      <p><strong>Web:</strong> <span id="modalWeb"></span></p>
+      <p><strong>Cărți:</strong> <span id="modalBooks"></span></p>
+    </div>
+  </div>
+
+  
+  <h2>Calendarul Tău Săptămânal - Vizualizare listă</h2>
   <div id="studyPlanContainer"></div>
 
   <p id="displayPreferences"></p>

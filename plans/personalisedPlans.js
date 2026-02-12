@@ -142,13 +142,29 @@ function renderStudyPlan(planData) {
       
             
       taskDiv.addEventListener("click", () => {
+        const webResources = Array.isArray(task.resources?.web)
+          ? task.resources.web
+          : [];
+
+        const bookResources = Array.isArray(task.resources?.books)
+          ? task.resources.books
+          : [];
+
         document.getElementById("modalTitle").textContent = task.title;
         document.getElementById("modalDescription").textContent = task.description;
         document.getElementById("modalDuration").textContent = task.duration;
-        document.getElementById("modalWeb").innerHTML = task.resources.web.map(link => `<a href="${link}" target="_blank">${link}</a>`).join(", ");
-        document.getElementById("modalBooks").textContent = task.resources.books.join(", ");
+
+        document.getElementById("modalWeb").innerHTML =
+          webResources.length
+            ? webResources.map(link => `<a href="${link}" target="_blank">${link}</a>`).join(", ")
+            : "—";
+
+        document.getElementById("modalBooks").textContent =
+          bookResources.length ? bookResources.join(", ") : "—";
+
         document.getElementById("taskModal").classList.remove("hidden");
       });
+
 
       dayDiv.appendChild(taskDiv);
     });

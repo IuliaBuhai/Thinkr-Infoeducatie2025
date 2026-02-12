@@ -10,14 +10,14 @@
             --bg-dark: #0f0f13;
             --bg-darker: #07070a;
             --bg-card: #1a1a24;
-            --accent-blue: #4d8eff;
-            --accent-purple: #8a63ff;
-            --accent-cyan: #00e0ff;
+            --accent-blue: #506280;
+            --accent-purple: #47347e;
+            --accent-cyan: #81b8c0;
             --text-primary: #f0f0f5;
-            --text-secondary: #a0a0b0;
-            --success: #2dd4a7;
-            --warning: #ffb74d;
-            --danger: #ff6b6b;
+            --text-secondary: #a5a5ab;
+            --success: #08795d;
+            --warning: #c07c16;
+            --danger: #b01919;
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.35);
@@ -271,27 +271,27 @@
             color: var(--text-secondary);
         }
 
-        .cta {
+        .cta, .news {
             padding: 6rem 2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .cta-content {
+        .cta-content ,.news-content {
             max-width: 800px;
             margin: 0 auto;
             position: relative;
             z-index: 2;
         }
 
-        .cta h2 {
+        .cta h2, .news h2 {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .cta p {
+        .cta p, .news p {
             color: var(--text-secondary);
             font-size: 1.1rem;
             margin-bottom: 2rem;
@@ -416,8 +416,8 @@
         </nav>
         
         <div class="auth-buttons">
-            <a href="login.html" class="btn btn-outline">Autentificare</a>
-            <a href="signup.html" class="btn btn-primary">Înregistrare</a>
+            <a href="/auth/login.html" class="btn btn-outline">Autentificare</a>
+            <a href="/auth/signup.html" class="btn btn-primary">Înregistrare</a>
         </div>
     </header>
 
@@ -482,11 +482,19 @@
         </div>
     </section>
 
+     <section class="news">
+        <div class="news-content">
+            <h2>Noutați și actualizări</h2>
+            <p>Rămâi la curent cu cele mai recente funcționalități și îmbunătățiri ale platformei noastre.</p>
+            <p>...</p>
+        </div>
+    </section>
+
     <section class="cta">
         <div class="cta-content">
             <h2>Gata să-ți transformi experiența de învățare?</h2>
             <p>Înscrie-te acum pentru a descoperi cum poți învăța mai inteligent, nu mai mult.</p>
-            <a href="signup.html" class="btn btn-primary">Înregistrează-te gratuit</a>
+            <a href="/auth/signup.html" class="btn btn-primary">Înregistrează-te gratuit</a>
         </div>
     </section>
 
@@ -502,8 +510,8 @@
                 <ul>
                     <li><a href="#features">Funcționalități</a></li>
                     <li><a href="#about">Despre Noi</a></li>
-                    <li><a href="login.html">Autentificare</a></li>
-                    <li><a href="signup.html">Înregistrare</a></li>
+                    <li><a href="/auth/login.html">Autentificare</a></li>
+                    <li><a href="/auth/signup.html">Înregistrare</a></li>
                 </ul>
             </div>
             
@@ -511,25 +519,23 @@
                 <h3>Resurse</h3>
                 <ul>
                     
-                    <li><a href="articole.html">Ghiduri de învățare</a></li>
-                    <li><a href="qa.html">Întrebări frecvente</a></li>
+                    <li><a href="/articles/articole.html">Ghiduri de învățare</a></li>
+                    <li><a href="/articles/qa.html">Întrebări frecvente</a></li>
                 </ul>
             </div>
             
             <div class="footer-column">
                 <h3>Contact</h3>
                 <ul>
-                    <li><a href="mailto:contact@thinkr.ro">iuliabuhai2006@gmail.com</a></li>
-                    
+                    <li><a href="mailto:iuliabuhai2006@gmail.com">iuliabuhai2006@gmail.com</a></li>
                     <li>Bistrița, România</li>
                 </ul>
             </div>
         </div>
         
-       
         
         <div class="copyright">
-            <p>&copy; 2025 Thinkr. Toate drepturile rezervate.</p>
+            <p>&copy; 2026 Thinkr. Toate drepturile rezervate.</p>
         </div>
     </footer>
 </body>
