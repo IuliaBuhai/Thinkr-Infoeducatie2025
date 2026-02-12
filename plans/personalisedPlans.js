@@ -174,7 +174,6 @@ async function initPrefForm() {
 
     const age = document.getElementById("age").value.trim();
     const preferedTime = document.getElementById("preferedTime").value.trim();
-    const tasks = document.getElementById("tasks").value.trim();
     const avgStudy = await averageStudySessions();
     const learnerType = await getLearnerType();
 
@@ -184,7 +183,6 @@ async function initPrefForm() {
       avgStudySession: avgStudy,
       preferedTime: preferedTime,
       learnerType: learnerType,
-      tasks: tasks,
     });
 
     form.style.display = "none";
@@ -193,6 +191,7 @@ async function initPrefForm() {
 }
 
  async function loadExistingPlan() {
+  document.getElementById("calendar").innerHTML = "<p>Se încarcă planul tău...</p>";
   const planQuery = query(
     collection(db, "weekPlan"),
     where("userId", "==", currentUser.uid)
@@ -212,6 +211,8 @@ async function initPlanForm() {
   const form = document.getElementById("planForm");
 
   form.addEventListener("submit", async (e) => {
+    document.getElementById("calendar").innerHTML = "<p>Se generează planul tău...</p>";
+    document.getElementById("generatePlanButton").disabled = true;
     e.preventDefault();
 
     const taskInput = document.getElementById("planTasks").value.trim();
