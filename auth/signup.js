@@ -1,4 +1,4 @@
-import { auth, db } from './firebase.js';
+import { auth, db } from '/auth/firebase.js';
 
 import {
   createUserWithEmailAndPassword
@@ -32,7 +32,7 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
     });
 
     alert("V-ați înregistrat cu succes!");
-    window.location.href = "dashboard.html";
+    window.location.href = "/dashboard.html";
 
   } catch (error) {
     console.error("Signup error:", error);
