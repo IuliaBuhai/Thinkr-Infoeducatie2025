@@ -7,6 +7,7 @@ onAuthStateChanged(auth, async (user) => {
     return window.location.href = 'login.html';
   }
   await getTop15();
+  hideLoader();
 });
 
 async function getTop15() {
@@ -88,4 +89,15 @@ async function getStreak(userId) {
     }
 
     
+}
+
+function hideLoader() {
+  const loader = document.getElementById("loader");
+  if (!loader) return;
+
+  loader.classList.add("hide");
+
+  setTimeout(() => {
+    loader.remove();
+  }, 600);
 }

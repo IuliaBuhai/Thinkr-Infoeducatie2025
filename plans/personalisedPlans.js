@@ -14,6 +14,8 @@ onAuthStateChanged(auth, async (user) => {
   await initPrefForm();     
   await initPlanForm();     
   await loadExistingPlan();
+
+  hideLoader();
 });
 
 async function getUserName() {
@@ -29,6 +31,7 @@ async function getUserName() {
   }
 
   return snapshot.docs[0].data().username;
+
 }
 
 async function averageStudySessions() {
@@ -303,4 +306,15 @@ async function initPlanForm() {
       document.getElementById("generatePlanButton").disabled = false;
     }
   });
+}
+
+function hideLoader() {
+  const loader = document.getElementById("loader");
+  if (!loader) return;
+
+  loader.classList.add("hide");
+
+  setTimeout(() => {
+    loader.remove();
+  }, 600);
 }

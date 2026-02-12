@@ -89,8 +89,20 @@ onAuthStateChanged(auth, async (user) => {
   } catch (error) {
     console.error("Error initializing dashboard:", error);
   }
+
+  hideLoader();
 });
 
+function hideLoader() {
+  const loader = document.getElementById("loader");
+  if (!loader) return;
+
+  loader.classList.add("hide");
+
+  setTimeout(() => {
+    loader.remove();
+  }, 600);
+}
 
 async function getDataFromUser(){
   createUserInfoForm('dataForm');
@@ -1219,7 +1231,5 @@ async function addSession() {
     }
   });
 }
-
-
 
 

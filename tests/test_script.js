@@ -13,7 +13,7 @@
   
     await displayTestResultHistory();
     await loadAllLectures();
-  
+    hideLoader();
   });
     function initTestForm(){
       const form = document.getElementById("generateTest");
@@ -497,4 +497,15 @@ async function loadAllLecturesComplete() {
     h2.style.cursor = "pointer";
     displayLessons.appendChild(h2);
     });
+}
+
+function hideLoader() {
+  const loader = document.getElementById("loader");
+  if (!loader) return;
+
+  loader.classList.add("hide");
+
+  setTimeout(() => {
+    loader.remove();
+  }, 600);
 }

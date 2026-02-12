@@ -4,286 +4,269 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Thinkr</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Michroma&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
     <link rel="stylesheet" href="styles.css">
-    
 </head>
 <body>
-    <div id="dataForm" style="
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 2rem;
-  margin: 0;
-
-  background: var(--glass-effect);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  overflow: hidden;
-  z-index: 101;
-"></div>
-<header>
-    <div style="display: flex; align-items: center; gap: 1rem;">
-        <div class="logo-container">
-            <img src="logo1.png" alt="Thinkr Logo" class="logo">
+    <div id="loader">
+        <div class="loader-glass">
+            <img src="logo1.png" alt="Thinkr Logo" class="loader-logo" />
         </div>
-        <div id="greeting">Bine ai venit!</div>
     </div>
-    <a href="/plans/personalisedPlans.html"><button>PlanneR</button></a>
-    <a href="/learning/styles.html"><button>Test stil învățare</button></a>
-    <a href="/tests/tests.html"><button>Generare teste</button></a>
-    <a href="/index.html"><button>Acasa</button></a>
-    <a href="/articles/articole.html"><button>Articole</button></a>
-    <button id="logoutBtn">Logout</button>
-</header>
+
+    <div id="dataForm"></div>
+
+    <header>
+        <div class="header-left">
+            <div class="logo-container">
+                <img src="logo1.png" alt="Thinkr Logo" class="logo">
+            </div>
+            <div id="greeting">Bine ai venit!</div>
+        </div>
+        <nav class="header-nav">
+            <a href="/plans/personalisedPlans.html"><button class="nav-btn">PlanneR</button></a>
+            <a href="/learning/styles.html"><button class="nav-btn">Test stil învățare</button></a>
+            <a href="/tests/tests.html"><button class="nav-btn">Generare teste</button></a>
+            <a href="/index.html"><button class="nav-btn">Acasa</button></a>
+            <a href="/articles/articole.html"><button class="nav-btn">Articole</button></a>
+            <button id="logoutBtn">Logout</button>
+        </nav>
+    </header>
 
     <div class="container">
-        <section class="card fade-in">
-            <h2>Progresul tău</h2>
-            <p class="section-description">Urmărește-ți progresul zilnic și vezi cât de aproape ești de atingerea obiectivului tău.</p>
+        <section class="dashboard-section fade-in">
+            <div class="section-header">
+                <h2>Progresul tău</h2>
+                <p class="section-description">Vizualizare de ansamblu a performanței tale academice.</p>
+            </div>
             
             <div class="card-grid">
-                <div class="card pulse">
+                <div class="card pulse main-stat">
                     <h3>Obiectiv zilnic</h3>
                     <div id="goalProgressContainer">
                         <div id="goalProgressBar"></div>
                         <div id="goalProgressLabel"></div>
                     </div>
-                    <div id="progressText" style="text-align: center; margin: 1rem 0; font-weight: 500;"></div>
-                    <div id="progressComparison" style="text-align: center; font-size: 0.9rem; color: var(--text-secondary);"></div>
-                    <form id="studyGoal">
+                    <div id="progressText" class="status-badge"></div>
+                    <div id="progressComparison" class="comparison-label"></div>
+                    <form id="studyGoal" class="inline-form">
                         <input type="time" id="timeGoal" required />
                         <button type="submit">Setează target</button>
                     </form>
                 </div>
 
-                <div class="card chart-container">
+                <div class="card chart-card">
                     <h3>Distribuția timpului</h3>
-                    <div id="distributionLoader" style="display: none; justify-content: center; align-items: center; height: 200px;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
-                            <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
-                            <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
-                        </svg>
-                        <span style="margin-left: 0.75rem;">Se încarcă datele...</span>
+                    <div class="chart-wrapper">
+                        <div id="distributionLoader" class="loader-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" class="spin-icon">
+                                <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
+                                <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
+                            </svg>
+                            <span>Se încarcă datele...</span>
+                        </div>
+                        <canvas id="timeDistributionChart"></canvas>
                     </div>
-                    <canvas id="timeDistributionChart"></canvas>
                 </div>
 
-                <div class="card chart-container">
+                <div class="card chart-card">
                     <h3>Evoluția săptămânală</h3>
-                    <div id="weeklyLoader" style="display: none; justify-content: center; align-items: center; height: 200px;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
+                    <div class="chart-wrapper">
+                        <div id="weeklyLoader" class="loader-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" class="spin-icon">
+                                <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
+                                <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
+                            </svg>
+                            <span>Se încarcă datele...</span>
+                        </div>
+                        <canvas id="weeklyStudyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="two-column-layout">
+            <section class="card fade-in">
+                <h2>Activitatea ta</h2>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <label>XP Total</label>
+                        <button id="xp" class="gamified-btn"><img src="xp.png" class="xpImg" /> --</button>
+                    </div>
+                    <div class="stat-item">
+                        <label>Streak</label>
+                        <button id="streak" class="gamified-btn"><img src="streak.png" class="streakImg" /> --</button>
+                    </div>
+                </div>
+                <p id="streakWarning"></p>
+                
+                <div class="heatmap-container">
+                    <h3>Harta activității</h3>
+                    <p class="small-desc">Activitatea din ultimele 12 săptămâni.</p>
+                    <div id="studyHeatmap" class="heatmap-grid"></div>
+                </div>
+
+                <div class="badges-container">
+                    <h3>Badge-uri obținute</h3>
+                    <div class="badge-row">
+                        <img src="badge/3.png" id="xp3" class="badge" title="3 XP">
+                        <img src="badge/10.png" id="xp10" class="badge" title="10 XP">
+                        <img src="badge/30.png" id="xp30" class="badge" title="30 XP">
+                        <img src="badge/60.png" id="xp60" class="badge" title="60 XP">
+                        <img src="badge/100.png" id="xp100" class="badge" title="100 XP">
+                        <img src="badge/200.png" id="xp200" class="badge" title="200 XP">
+                    </div>
+                </div>
+            </section>
+
+            <section class="card fade-in">
+                <h2>Productivitate</h2>
+                
+                <div class="tabs-container">
+                    <div class="tool-group">
+                        <h3>Sesiune de studiu</h3>
+                        <form id="clock" class="study-session-form">
+                            <div id="time">00:00:00</div>
+                            <div class="input-stack">
+                                <input list="titleSuggestions" id="sessionTitle" placeholder="Ce înveți astăzi?" required />
+                                <datalist id="titleSuggestions"></datalist>
+                                <input list="tagSuggestions" id="sessionTag" placeholder="Materia">
+                                <datalist id="tagSuggestions"></datalist>
+                                <input type="text" id="sessionDescription" placeholder="Detalii sesiune (opțional)" />
+                            </div>
+                            <div class="button-group">
+                                <button id="startBtn" type="button" data-tooltip="Start">Start</button>
+                                <button id="pauseBtn" type="button" data-tooltip="Pauză">Pauză</button>
+                                <button type="submit" id="stopBtn" data-tooltip="Stop">Stop</button>
+                                <button type="reset" id="resetBtn" data-tooltip="Reset">Resetează</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tool-group divider-top">
+                        <h3>Pomodoro Timer</h3>
+                        <form id="setPomodoro" class="pomodoro-config">
+                            <div class="pomodoro-settings">
+                                <div class="input-group">
+                                    <label>Focus</label>
+                                    <input type="number" id="minutes" placeholder="25" min="1" required />
+                                </div>
+                                <div class="input-group">
+                                    <label>Pauză</label>
+                                    <input type="number" id="breakMinutes" placeholder="5" min="1" required />
+                                </div>
+                                <div class="input-group">
+                                    <label>Cicluri</label>
+                                    <input type="number" id="cycles" placeholder="4" min="1" required />
+                                </div>
+                            </div>
+                            <button type="submit" class="w-100">Configurează</button>
+                        </form>
+                        <div id="timePomodoro">00:00</div>
+                        <div class="button-group">
+                            <button id="startBtnPomodoro" type="button">Start</button>
+                            <button id="pauseBtnPomodoro" type="button">Pauză</button>
+                            <button id="stopBtnPomodoro" type="button">Stop</button>
+                            <button id="resetBtnPomodoro" type="button">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="two-column-layout">
+            <section class="card fade-in">
+                <h2>Adăugare manuală</h2>
+                <form id="addSession" class="grid-form">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Materia</label>
+                            <input type="text" id="materie" placeholder="Ex: Biologie" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Titlu</label>
+                            <input type="text" id="titlu" placeholder="Ex: Anatomie" required />
+                        </div>
+                    </div>
+                    <label>Descriere</label>
+                    <input type="text" id="descriere" placeholder="Ex: Capitolul 5" required />
+                    <label>Durata (minute)</label>
+                    <input type="number" id="durata" placeholder="Ex: 45" required />
+                    <button type="submit">Salvează sesiunea</button>
+                </form>
+            </section>
+
+            <section class="card fade-in">
+                <h2>Istoric sesiuni</h2>
+                <section id="displaySessions" class="scrollable-history"></section>
+            </section>
+        </div>
+
+        <section class="card fade-in">
+            <h2>AI Study Planner</h2>
+            <div class="planner-layout">
+                <form id="StudyPlanForm" class="planner-form">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Clasa</label>
+                            <input type="text" id="grade" placeholder="9" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Materia</label>
+                            <input type="text" id="subject" placeholder="Matematică" required />
+                        </div>
+                    </div>
+                    <label>Lecție / Subiect</label>
+                    <input type="text" id="title" placeholder="Ex: Ecuații de gradul II" required />
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Zile</label>
+                            <input type="number" id="days" placeholder="5" />
+                        </div>
+                        <div class="input-group">
+                            <label>Ore/zi</label>
+                            <input type="number" id="hours" placeholder="2" />
+                        </div>
+                    </div>
+                    <button type="submit" class="w-100">Generează plan personalizat</button>
+                </form>
+
+                <div class="planner-output-container">
+                    <div id="loading" class="loader-container">
+                        <svg width="24" height="24" viewBox="0 0 24 24" class="spin-icon">
                             <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
                             <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
                         </svg>
-                        <span style="margin-left: 0.75rem;">Se încarcă datele...</span>
+                        Se generează...
                     </div>
-                    <canvas id="weeklyStudyChart"></canvas>
+                    <section id="planOutput"></section>
                 </div>
             </div>
-        </section>
 
-        <section class="card fade-in">
-            <h2>Activitatea ta</h2>
-            <h3>XP</h3>
-            <p>XP-ul tău adunat de-a lungul timpului(10 minute de studiu = 1XP) </p>
-            <button id="xp"><img src="xp.png" class="xpImg" /> Se încarcă</button>
-            <h3>Streak-ul tău</h3>
-            <button id="streak"><img src="streak.png" class="streakImg" /> Se încarcă..</button>
-            <p id="streakWarning"></p>
-            <p class="section-description">Vizualizează-ți activitatea de studiu din ultimele 12 săptămâni.</p>
-            <div id="studyHeatmap" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 0px; margin-top: 1.5rem;">
-                
+            <div class="history-section divider-top">
+                <h3>Istoric planuri</h3>
+                <form id="searchForm" class="search-box">
+                    <input type="text" id="searchPlan" placeholder="Caută în planurile salvate...">
+                    <button type="submit">Caută</button>
+                </form>
+                <section id="displayHistory" class="history-grid"></section>
             </div>
-            <h3>Badge-uri</h3>
-            <section class="card ">
-                <img src="badge/3.png" id="xp3" class="badge">
-                <img src="badge/10.png" id="xp10" class="badge">
-                <img src="badge/30.png" id="xp30" class="badge">
-                <img src="badge/60.png" id="xp60" class="badge">
-                <img src="badge/100.png" id="xp100" class="badge">
-                <img src="badge/200.png" id="xp200" class="badge">
-            </section>
-    
-        </section>
-
-        <section class="card fade-in">
-            <h2>Sesiuni de studiu</h2>
-            <p class="section-description">Începe o nouă sesiune de studiu și urmărește-ți progresul în timp real.</p>
-            
-            <form id="clock">
-                <div id="time">00:00:00</div>
-                <input list="titleSuggestions" id="sessionTitle" placeholder="Titlu sesiune (ce înveți la materia selectată)" required />
-                <datalist id="titleSuggestions"></datalist>
-                <input type="text" id="sessionDescription" placeholder="Detalii sesiune (ce ai învățat, ce ai reușit să faci etc.) - opțional" />
-                <input list="tagSuggestions" id="sessionTag" placeholder="Materia">
-                <datalist id="tagSuggestions"></datalist>
-                
-                <div class="button-group">
-                    <button id="startBtn" type="button" data-tooltip="Începe sesiunea">Start</button>
-                    <button id="pauseBtn" type="button" data-tooltip="Pauză temporară">Pauză</button>
-                    <button type="submit" id="stopBtn" data-tooltip="Finalizează sesiunea">Stop</button>
-                    <button type="reset" id="resetBtn" data-tooltip="Resetează timerul">Resetează</button>
-                </div>
-            </form>
-        </section>
-
-        <section class="card fade-in">
-              <h2>Pomodoro Timer</h2>
-              <p class="section-description">Concentrează-te folosind tehnica Pomodoro — alternează între sesiuni de lucru și pauze.</p>
-            
-              <!-- Pomodoro Settings -->
-              <form id="setPomodoro">
-                <div class="pomodoro-settings">
-                  <input type="number" id="minutes" placeholder="Minute focus (ex: 25)" min="1" required />
-                  <input type="number" id="breakMinutes" placeholder="Minute pauză (ex: 5)" min="1" required />
-                  <input type="number" id="cycles" placeholder="Număr cicluri (ex: 4)" min="1" required />
-                  <button type="submit" data-tooltip="Configurează și pornește Pomodoro">Setează Pomodoro</button>
-                </div>
-              </form>
-            
-              <div id="timePomodoro">00:00</div>
-            
-           
-              <div class="button-group">
-                <button id="startBtnPomodoro" type="button" data-tooltip="Începe Pomodoro">Start</button>
-                <button id="pauseBtnPomodoro" type="button" data-tooltip="Pauză temporară">Pauză</button>
-                <button id="stopBtnPomodoro" type="button" data-tooltip="Oprește și salvează Pomodoro">Stop</button>
-                <button id="resetBtnPomodoro" type="button" data-tooltip="Resetează Pomodoro">Resetează</button>
-              </div>
-            </section>
-
-        <section class="card fade-in">
-            <h2>Adăudare sesiune studiu </h2>
-            <p class="section-description">Adaugă o sesiune de studiu dacă nu ai reușit să o înregistrezi.</p>
-            
-            <form id="addSession">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-                    <div>
-                        <label for="materie">Materia</label>
-                        <input type="text" id="materie" placeholder="Ex: Biologie" required />
-                    </div>
-                    <div>
-                        <label for="titlu">Titlu sesiune(ce ai învățat)</label>
-                        <input type="text" id="titlu" placeholder="Ex: Țesut Muscular" required />
-                    </div>
-                </div>
-                
-                <label for="descriere">Descriere</label>
-                <input type="text" id="descriere" placeholder="Ex: Capitolul 5 și 6 din Corint" required />
-                
-                <label for="durata">Durata( în minute )</label>
-                <input type="text" id="durata" placeholder="Ex: 25" required />
-                
-
-                <button type="submit" style="margin-top: 1.5rem;">Adaugă sesiunea</button>
-            </form>
-
-            </section>
-
-
-        <section class="card fade-in">
-            <h2>Istoric sesiuni</h2>
-            <p class="section-description">Toate sesiunile tale de studiu, organizate cronologic.</p>
-            <section id="displaySessions"></section>
-        </section>
-
-        <section class="card fade-in">
-            <h2>Planuri de studiu</h2>
-            <p class="section-description">Generează un plan personalizat de studiu bazat pe nevoile tale.</p>
-            
-            <form id="StudyPlanForm">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-                    <div>
-                        <label for="grade">Clasa</label>
-                        <input type="text" id="grade" placeholder="Ex: 9" required />
-                    </div>
-                    <div>
-                        <label for="subject">Materia</label>
-                        <input type="text" id="subject" placeholder="Ex: Matematică" required />
-                    </div>
-                </div>
-                
-                <label for="title">Lecție / Subiect</label>
-                <input type="text" id="title" placeholder="Ce vrei să înveți? (Ex: Ecuații de gradul II)" required />
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
-                    <div>
-                        <label for="days">Zile disponibile</label>
-                        <input type="number" id="days" placeholder="Ex: 5" />
-                    </div>
-                    <div>
-                        <label for="hours">Ore/zi</label>
-                        <input type="number" id="hours" placeholder="Ex: 2" />
-                    </div>
-                </div>
-
-                <button type="submit" style="margin-top: 1.5rem;">Generează plan</button>
-            </form>
-
-            <div id="loading">
-                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 0.75rem; animation: spin 1s linear infinite;">
-                    <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25" fill="currentColor"/>
-                    <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="currentColor"/>
-                </svg>
-                Se generează planul...
-            </div>
-
-            <section id="planOutput"></section>
-            
-            <form id="searchForm">
-                <input type="text" id="searchPlan" placeholder="Caută plan după materie, clasă etc.">
-                <button type="submit">Caută</button>
-            </form>
-
-            <h3 style="margin-top: 2.5rem;">Istoric planuri</h3>
-            <p class="section-description">Planurile tale de studiu generate anterior.</p>
-            <section id="displayHistory"></section>
         </section>
     </div>
 
     <button class="fab" id="mobileFab">+</button>
 
     <script>
-        
         const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        `;
+        style.textContent = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
         document.head.appendChild(style);
-
-        
-        document.getElementById('mobileFab').addEventListener('click', function() {
-          
-        document.querySelector('#clock').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('mobileFab').addEventListener('click', () => {
+            document.querySelector('#clock').scrollIntoView({ behavior: 'smooth' });
         });
     </script>
     <script type="module" src="dashboard.js"></script>
-   <!-- <script type="module" src="plans.js"></script> -->
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-

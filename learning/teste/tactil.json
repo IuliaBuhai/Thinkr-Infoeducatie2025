@@ -1,0 +1,68 @@
+{
+  "questions": [
+    {
+      "question": "Prefer să folosesc postere, modele sau practică efectivă și alte activități în clasă",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi place să lucrez cu mâinile sau să fac lucruri",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Îmi amintesc cel mai bine scriind lucrurile.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Mă joc cu monede sau chei în buzunar.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Mestec gumă, fumez sau iau gustări în timp ce studiez.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Învăț ortografia cuvintelor „scriindu-le cu degetele” în aer",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Țin obiecte în mâini în timpul perioadelor de învățare.",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    },
+    {
+      "question": "Nu am o problemă când vine vorba de contactul fizic cu alte persoane",
+      "answers": [
+        { "text": "Des", "score": 5 },
+        { "text": "Cateodata", "score": 3 },
+        { "text": "Niciodată", "score": 1 }
+      ]
+    }
+  ]
+}
