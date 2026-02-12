@@ -271,6 +271,7 @@ async function initPlanForm() {
       }
 
       renderStudyPlan(data);
+      document.getElementById("generatePlanButton").disabled = false;
     }
   });
 }

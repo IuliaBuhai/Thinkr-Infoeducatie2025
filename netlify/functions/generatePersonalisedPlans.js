@@ -41,10 +41,7 @@ export async function handler(event) {
 
             1. Fiecare zi trebuie să aibă eticheta exactă din lista: ${weekDaysOrdered.join(", ")}.
             2. Pentru fiecare zi, include între numarul de task-uri necesare **Nu fiecare zi trebuie să conțină task-uri, dacă lista de task-uri oferită include activități pentru acea zi.**
-            3. Task-urile pot fi:
-              - zilnice (recurente) sau
-              - punctuale (în zile specifice),
-              și trebuie să fie **doar din lista de task-uri furnizată**: ${tasks}. **Nu adăuga task-uri noi sau inventate.**
+            3. Task-urile trebuie să fie **doar din lista de task-uri furnizată**: ${tasks}. **Nu adăuga task-uri noi sau inventate.**
             4. Pentru fiecare task, oferă:
               - "title": un titlu clar,
               - "description": descriere detaliată și sugestii utile,
