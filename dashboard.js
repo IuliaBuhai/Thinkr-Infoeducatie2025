@@ -79,7 +79,7 @@ onAuthStateChanged(auth, async (user) => {
     logoutBtn.addEventListener("click", async () => {
       try {
         await signOut(auth);
-        window.location.href = 'login.html';
+        window.location.href = 'auth/login.html';
       } catch (err) {
         console.error("Eroare la deconectare:", err);
         alert("Eroare la deconectare: " + err.message);
@@ -1219,5 +1219,6 @@ async function addSession() {
     }
   });
 }
+
 
 
