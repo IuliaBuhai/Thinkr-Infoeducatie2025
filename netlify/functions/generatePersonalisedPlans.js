@@ -37,45 +37,49 @@ export async function handler(event) {
 
 
     let prompt = `
-        Creează un plan detaliat de studiu pentru această săptămână, respectând următoarele reguli:
-        
-        - Fiecare zi va avea eticheta exactă în formatul: ${weekDaysOrdered.join(", ")}, pe care trebuie să o folosești în răspuns.
-        - Pentru fiecare zi, include între 2 și 10 task-uri, organizate echilibrat în timp.
-        - Task-urile pot fi recurente (zilnic) sau punctuale (în zile specifice), respectă cerințele din lista de task-uri.
-        - Pentru fiecare task, oferă:
-          * titlu clar,
-          * descriere detaliată a activității,
-          * durată exprimată în minute (dacă este mai mare de 60 minute, folosește formatul "X ore Y minute", de ex: "2 ore 30 minute"),
-          * resurse web (2-3 linkuri relevante) și cărți recomandate (titlu și autor) – dacă nu sunt resurse, scrie "nu este cazul".
-        - Studentul are ${age} ani și stilul său de învățare optim este: "${learnerType}".
-        - Următoarele detalii trebuie incluse: ${tasks}.
-        - Organizează sarcinile astfel încât să nu fie prea încărcate în aceeași zi și să existe varietate.
-        - Dacă un task este zilnic (ex: pregătire bac română 2 ore pe zi), asigură-te că îl adaugi în fiecare zi.
-        - Fii creativ și oferă sugestii utile în descriere și resurse reale.
-        - Returnează DOAR un JSON valid în formatul următor:
-        
-        {
-          "plan": [
+            Creează un plan detaliat de studiu pentru această săptămână, respectând următoarele reguli:
+
+            1. Fiecare zi trebuie să aibă eticheta exactă din lista: ${weekDaysOrdered.join(", ")}.
+            2. Pentru fiecare zi, include între numarul de task-uri necesare **Fiecare zi trebuie să conțină task-uri, dacă lista de task-uri oferită include activități pentru acea zi.**
+            3. Task-urile pot fi:
+              - zilnice (recurente) sau
+              - punctuale (în zile specifice),
+              și trebuie să fie **doar din lista de task-uri furnizată**: ${tasks}. **Nu adăuga task-uri noi sau inventate.**
+            4. Pentru fiecare task, oferă:
+              - "title": un titlu clar,
+              - "description": descriere detaliată și sugestii utile,
+              - "duration": durata în minute sau "X ore Y minute" dacă > 60 minute,
+              - "resources": 
+                  * "web": 2-3 linkuri relevante sau "nu este cazul",
+                  * "books": titlu și autor sau "nu este cazul".
+            5. Studentul are ${age} ani și stilul său de învățare optim este "${learnerType}, si in medie invata ${avgStudyTime} minute pe zi".
+            6. Organizează sarcinile astfel încât nicio zi să nu fie suprasolicitată și să existe varietate.
+            7. Dacă un task este zilnic, adaugă-l în fiecare zi.
+            8. Fii creativ și oferă resurse reale și utile.
+            9. Returnează **DOAR** un JSON valid în următorul format:
+
             {
-              "day": "Luni",
-              "tasks": [
+              "plan": [
                 {
-                  "title": "Titlu task",
-                  "description": "Descriere detaliată a activității...",
-                  "duration": "X ore Y minute",
-                  "resources": {
-                    "web": ["https://exemplu1.com", "https://exemplu2.com"],
-                    "books": ["Titlu carte - Autor", "Altă carte - Autor"]
-                  }
+                  "day": "Luni",
+                  "tasks": [
+                    {
+                      "title": "Titlu task",
+                      "description": "Descriere detaliată a activității...",
+                      "duration": "X ore Y minute",
+                      "resources": {
+                        "web": ["https://exemplu1.com", "https://exemplu2.com"],
+                        "books": ["Titlu carte - Autor", "Altă carte - Autor"]
+                      }
+                    },
+                    ...
+                  ]
                 },
                 ...
               ]
-            },
-            ...
-          ]
-        }
+            }
+            `.trim();
 
-    `.trim();
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo", 
