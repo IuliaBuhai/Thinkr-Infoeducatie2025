@@ -97,8 +97,21 @@ function renderStudyPlan(planData) {
       taskDiv.appendChild(duration);
 
       const resources = document.createElement("div");
-      const webLinks = task.resources.web.map(link => `<a href="${link}" target="_blank">${link}</a>`).join(", ");
-      const bookList = task.resources.books.join(", ");
+      const webResources = Array.isArray(task.resources?.web)
+      ? task.resources.web
+      : [];
+
+    const bookResources = Array.isArray(task.resources?.books)
+      ? task.resources.books
+      : [];
+
+      const webLinks = webResources
+        .map(link => `<a href="${link}" target="_blank">${link}</a>`)
+        .join(", ");
+
+      const bookList = bookResources.join(", ");
+
+
       resources.innerHTML = `
         <p><strong>Web:</strong> ${webLinks}</p>
         <p><strong>Cărți:</strong> ${bookList}</p>
