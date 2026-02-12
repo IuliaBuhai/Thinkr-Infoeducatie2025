@@ -1,0 +1,224 @@
+
+        :root {
+            --bg-dark: #0f0f13;
+            --bg-darker: #07070a;
+            --bg-card: #1a1a24;
+            --accent-blue: #506280;
+            --accent-purple: #47347e;
+            --accent-cyan: #81b8c0;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a5a5ab;
+            --success: #08795d;
+            --warning: #c07c16;
+            --danger: #b01919;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.35);
+            --border-radius: 12px;
+            --glass-effect: rgba(30, 30, 45, 0.6);
+        }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #3a3a58);
+      color: var(--text-primary);
+      padding: 2rem;
+      margin: 0;
+    }
+
+    h2, h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--accent-blue);
+    }
+
+    form, .glass-card, .calendar-container, .modal-content {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    input, textarea, button {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .button {
+      background: var(--accent-blue);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .button:hover {
+      background: var(--accent-purple);
+    }
+
+    .calendar-container {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+    }
+
+    .day-column {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      text-align: center;
+    }
+
+    .day-column h4 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .task-title {
+      background: var(--accent-purple);
+      margin: 6px 0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .task-title:hover {
+      background: var(--accent-blue);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 16px;
+      color: white;
+      position: relative;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #studyPlanContainer {
+      margin-top: 2rem;
+    }
+
+    .day-plan {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .task {
+      margin-bottom: 1rem;
+      background-color: rgba(77, 142, 255, 0.05);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .task a {
+      color: var(--accent-purple);
+    }
+
+   
+       header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        background-color: var(--glass-effect);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: background-color 0.3s ease;
+        }
+
+    .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    }
+
+    .logo-container .logo {
+    height: 40px;
+    width: auto;
+    }
+
+        .greeting {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--accent-blue);
+        user-select: none;
+        }
+
+        .nav-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .nav-buttons a button,
+        .nav-buttons button {
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+
+        .nav-buttons a button,
+        .nav-buttons button {
+        background: var(--accent-blue);
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 700;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        }
+
+        .nav-buttons a button:hover,
+        .nav-buttons button:hover {
+        background: var(--accent-purple);
+        }

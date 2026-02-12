@@ -48,7 +48,7 @@ export async function handler(event) {
           * durată exprimată în minute (dacă este mai mare de 60 minute, folosește formatul "X ore Y minute", de ex: "2 ore 30 minute"),
           * resurse web (2-3 linkuri relevante) și cărți recomandate (titlu și autor) – dacă nu sunt resurse, scrie "nu este cazul".
         - Studentul are ${age} ani și stilul său de învățare optim este: "${learnerType}".
-        - Următoarele task-uri trebuie incluse, în ordinea priorității, respectând detaliile din paranteze: ${tasks}.
+        - Următoarele detalii trebuie incluse: ${tasks}.
         - Organizează sarcinile astfel încât să nu fie prea încărcate în aceeași zi și să existe varietate.
         - Dacă un task este zilnic (ex: pregătire bac română 2 ore pe zi), asigură-te că îl adaugi în fiecare zi.
         - Fii creativ și oferă sugestii utile în descriere și resurse reale.

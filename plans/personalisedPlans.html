@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PlanneR</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500&display=swap" rel="stylesheet">
+  <link rel = "stylesheet" href = "../styles.css">
+  <link rel="stylesheet" href="personalised-plans-styles.css">
+  
+</head>
+<body>
+  <header>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="logo-container">
+              <img src="/logo1.png" alt="Thinkr Logo" class="logo">
+          </div>
+      </div>
+      <a href="personalisedPlans.html"><button>PlanneR</button></a>
+</header>
+
+
+  <h2>Calendarul Tău Săptămânal</h2>
+  <div id="calendar" class="calendar-container"></div>
+
+  <div id="taskModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3 id="modalTitle"></h3>
+      <p id="modalDescription"></p>
+      <p><strong>Durată:</strong> <span id="modalDuration"></span> minute</p>
+      <p><strong>Web:</strong> <span id="modalWeb"></span></p>
+      <p><strong>Cărți:</strong> <span id="modalBooks"></span></p>
+    </div>
+  </div>
+
+  <form id="prefForm" style="display: none;">
+    <h3>Setează-ți preferințele</h3>
+    <input type="number" id="age" placeholder="Vârsta" required />
+    <input type="text" id="preferedTime" placeholder="Perioada preferată de studiu" required />
+    <textarea id="tasks" placeholder="Detalii importante despre task-uri sau rutine" required></textarea>
+    <button type="submit" class="button">Salvează Preferințe</button>
+  </form>
+
+  <form id="planForm">
+    <h3>Generează un plan personalizat</h3>
+    <textarea id="planTasks" placeholder="Scrie task-urile pentru această săptămână..." required></textarea>
+    <button type="submit" class="button">Generează plan sau modifică-l pe cel vechi</button>
+  </form>
+
+  <div id="studyPlanContainer"></div>
+
+  <p id="displayPreferences"></p>
+
+  <script type="module" src="personalisedPlans.js"></script>
+</body>
+</html>

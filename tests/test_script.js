@@ -1,5 +1,5 @@
 
-    import { auth, db } from '/firebase.js';
+    import { auth, db } from '/auth/firebase.js';
     import {onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js';
     import {addDoc,collection, query, getDocs, where ,limit} from 'https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js';
 
