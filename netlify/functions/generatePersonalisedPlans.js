@@ -40,7 +40,7 @@ export async function handler(event) {
             Creează un plan detaliat de studiu pentru această săptămână, respectând următoarele reguli:
 
             1. Fiecare zi trebuie să aibă eticheta exactă din lista: ${weekDaysOrdered.join(", ")}.
-            2. Pentru fiecare zi, include între numarul de task-uri necesare **Fiecare zi trebuie să conțină task-uri, dacă lista de task-uri oferită include activități pentru acea zi.**
+            2. Pentru fiecare zi, include între numarul de task-uri necesare **Nu fiecare zi trebuie să conțină task-uri, dacă lista de task-uri oferită include activități pentru acea zi.**
             3. Task-urile pot fi:
               - zilnice (recurente) sau
               - punctuale (în zile specifice),
@@ -54,7 +54,7 @@ export async function handler(event) {
                   * "books": titlu și autor sau "nu este cazul".
             5. Studentul are ${age} ani și stilul său de învățare optim este "${learnerType}, si in medie invata ${avgStudyTime} minute pe zi".
             6. Organizează sarcinile astfel încât nicio zi să nu fie suprasolicitată și să existe varietate.
-            7. Dacă un task este zilnic, adaugă-l în fiecare zi.
+            7. Dacă un task este zilnic, adaugă-l în fiecare zi.Daca o zi nu are task-uri specifice, las-o goală sau adaugă un mesaj de tipul "Zi de relaxare sau revizuire".
             8. Fii creativ și oferă resurse reale și utile.
             9. Returnează **DOAR** un JSON valid în următorul format:
 
